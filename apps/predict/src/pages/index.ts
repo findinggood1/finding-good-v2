@@ -1,0 +1,7 @@
+export { HomePage } from './HomePage'
+export { NewPredictionPage } from './NewPredictionPage'
+export { QuickPredictPage } from './QuickPredictPage'
+export { ViewPredictionPage } from './ViewPredictionPage'
+export { ResultsPage } from './ResultsPage'
+export { LoginPage } from './LoginPage'
+export { AuthCallbackPage } from './AuthCallbackPage'

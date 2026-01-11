@@ -51,7 +51,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     })
     return { error: error ? new Error(error.message) : null }
@@ -60,6 +60,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const signOut = useCallback(async (): Promise<void> => {
     const supabase = getSupabase()
     await supabase.auth.signOut()
+    // Clear app data from localStorage
+    localStorage.removeItem('prediction-form-draft')
   }, [])
 
   const userEmail = user?.email ?? null
