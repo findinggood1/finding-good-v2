@@ -1,0 +1,17 @@
+{
+  "name": "finding-good-v2",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:predict": "pnpm --filter @finding-good/predict dev",
+    "dev:priority": "pnpm --filter @finding-good/priority dev",
+    "dev:together": "pnpm --filter @finding-good/together dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "packageManager": "pnpm@9.0.0"
+}
