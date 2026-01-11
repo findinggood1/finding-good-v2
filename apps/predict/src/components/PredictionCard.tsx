@@ -3,11 +3,12 @@ import { type Prediction, type FiresElement, FIRES_COLORS } from '@finding-good/
 
 interface PredictionCardProps {
   prediction: Prediction
+  onDelete?: (id: string) => void
 }
 
 const FIRES_ORDER: FiresElement[] = ['feelings', 'influence', 'resilience', 'ethics', 'strengths']
 
-export function PredictionCard({ prediction }: PredictionCardProps) {
+export function PredictionCard({ prediction, onDelete }: PredictionCardProps) {
   const hasScores = prediction.scores && Object.keys(prediction.scores).length > 0
 
   const presentElements = hasScores
@@ -22,10 +23,18 @@ export function PredictionCard({ prediction }: PredictionCardProps) {
     })
   }
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (onDelete) {
+      onDelete(prediction.id)
+    }
+  }
+
   return (
     <Link
       to={`/${prediction.id}`}
-      className="block bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md hover:border-brand-primary/20 transition-all"
+      className="block bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md hover:border-brand-primary/20 transition-all group"
     >
       <div className="flex justify-between items-start gap-3">
         <div className="flex-1 min-w-0">
@@ -34,9 +43,22 @@ export function PredictionCard({ prediction }: PredictionCardProps) {
             <p className="text-sm text-gray-500 mt-1 line-clamp-2">{prediction.description}</p>
           )}
         </div>
-        <span className="text-xs text-gray-400 whitespace-nowrap">
-          {formatDate(prediction.updated_at)}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-400 whitespace-nowrap">
+            {formatDate(prediction.updated_at)}
+          </span>
+          {onDelete && (
+            <button
+              onClick={handleDelete}
+              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+              title="Delete prediction"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       {presentElements.length > 0 && (

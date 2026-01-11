@@ -1,14 +1,56 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useAuth } from '@finding-good/shared'
+import { useAuth, getSupabase } from '@finding-good/shared'
 import { usePredictions } from '../hooks'
 import { PredictionCard } from '../components'
 
 export function HomePage() {
   const { userEmail, signOut } = useAuth()
   const { predictions, loading, error, refetch } = usePredictions()
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   const handleSignOut = async () => {
     await signOut()
+  }
+
+  const handleDeleteRequest = (id: string) => {
+    const prediction = predictions.find(p => p.id === id)
+    if (prediction) {
+      setDeleteTarget({ id, title: prediction.title })
+    }
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return
+    
+    setDeleting(true)
+    try {
+      const supabase = getSupabase()
+      
+      // Delete prediction (cascades to snapshots and connections via FK)
+      const { error } = await supabase
+        .from('predictions')
+        .delete()
+        .eq('id', deleteTarget.id)
+      
+      if (error) {
+        console.error('Failed to delete prediction:', error)
+        alert('Failed to delete prediction. Please try again.')
+      } else {
+        await refetch()
+      }
+    } catch (err) {
+      console.error('Delete error:', err)
+      alert('Failed to delete prediction. Please try again.')
+    } finally {
+      setDeleting(false)
+      setDeleteTarget(null)
+    }
+  }
+
+  const handleDeleteCancel = () => {
+    setDeleteTarget(null)
   }
 
   return (
@@ -105,12 +147,55 @@ export function HomePage() {
           {!loading && !error && predictions.length > 0 && (
             <div className="space-y-3">
               {predictions.map((prediction) => (
-                <PredictionCard key={prediction.id} prediction={prediction} />
+                <PredictionCard 
+                  key={prediction.id} 
+                  prediction={prediction} 
+                  onDelete={handleDeleteRequest}
+                />
               ))}
             </div>
           )}
         </div>
       </main>
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Prediction?</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Are you sure you want to delete "<span className="font-medium">{deleteTarget.title}</span>"? 
+              This will also delete all associated snapshots and connections. This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleDeleteCancel}
+                disabled={deleting}
+                className="flex-1 py-2.5 px-4 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={deleting}
+                className="flex-1 py-2.5 px-4 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {deleting ? (
+                  <>
+                    <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Deleting...
+                  </>
+                ) : (
+                  'Delete'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

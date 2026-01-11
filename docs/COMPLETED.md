@@ -65,3 +65,50 @@
   - Connections lists (future and past)
   - AI analysis placeholder
   - View Details and Back to Home buttons
+
+### Phase 3: AI Integration
+- [x] 3a: predict-analyze edge function
+  - Claude API integration for prediction analysis
+  - Calculates predictability score (0-100)
+  - Extracts FIRES element zones
+  - Generates growth guidance
+  - Creates 48-hour action question
+- [x] 3b: Predictability scoring algorithm
+  - Zone breakdown per FIRES element
+  - Validation signal detection
+  - Growth opportunity identification
+- [x] 3c: AI narrative integration
+  - useSavePrediction calls generateAINarrative() async
+  - Non-blocking background processing
+  - Narrative stored in ai_narrative column
+  - ResultsPage displays AI insights sections
+
+### Phase 4: Priority Builder
+- [x] 4a: Priority app routing
+  - React Router with 7 routes (/, /confirm, /ask, /respond/:token, /history, /login, /auth/callback)
+  - Placeholder pages created
+  - AuthProvider and ProtectedRoute integration
+  - Tailwind CSS configured
+  - Runs on port 3002
+- [x] 4b: Priority confirmation flow UI
+  - 3-question flow (What went well, Your part, Impact)
+  - Helper framing chips for inspiration
+  - Optional prediction link dropdown
+  - Share to Campfire toggle
+  - Results view with Priority Line and FIRES elements
+  - Uses shared components (Button, Card, Textarea, Badge)
+- [x] 4c: Priority data persistence
+  - Priority saves to database
+  - AI generates Priority Line (integrity statement)
+  - FIRES elements extracted from responses
+  - No console errors
+- [x] 4d: Ask and Respond flows
+  - AskPage for creating invitation links
+  - Fields: name, email, relationship, personal message, linked prediction
+  - 7-day expiring token-based links
+  - RespondPage with 3-question flow (same as ConfirmPage)
+  - Helper framing chips for each question
+  - Anonymous response submission
+  - Status handling: loading, valid, expired, already_responded, not_found, error
+  - Success states after submission
+  - Database tables: priority_asks, priority_responses with RLS policies

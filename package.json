@@ -8,10 +8,17 @@
     "dev:priority": "pnpm --filter @finding-good/priority dev",
     "dev:together": "pnpm --filter @finding-good/together dev",
     "build": "pnpm -r build",
-    "lint": "pnpm -r lint"
+    "lint": "pnpm -r lint",
+    "persona": "node scripts/insert-persona.js",
+    "persona:list": "node scripts/insert-persona.js --list",
+    "persona:all": "node scripts/insert-persona.js --all"
   },
   "devDependencies": {
     "typescript": "^5.4.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "dotenv": "^16.3.1"
   },
   "packageManager": "pnpm@9.0.0"
 }

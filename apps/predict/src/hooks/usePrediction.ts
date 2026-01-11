@@ -25,8 +25,41 @@ interface Snapshot {
   predictability_score: number | null
   growth_opportunity: string | null
   question_48hr: string | null
-  ai_narrative: string | null
+  narrative: string | null
   created_at: string
+}
+
+// New narrative format (v3)
+export interface AIResponse {
+  // Core assessments
+  clarity_level?: 'strong' | 'building' | 'emerging'
+  clarity_rationale?: string
+  confidence_level?: 'strong' | 'building' | 'emerging'
+  confidence_rationale?: string
+  alignment_level?: 'strong' | 'building' | 'emerging'
+  alignment_rationale?: string
+  
+  // Pattern insight
+  pattern_insight?: string
+  
+  // Edge insight
+  edge_insight?: string
+  edge_question?: string
+  
+  // Network
+  network_insight?: string
+  
+  // Legacy format support (v1/v2)
+  future_story_insight?: string
+  past_story_insight?: string
+  alignment_insight?: string
+  growth_opportunity_text?: string
+  strengths_recognition?: string
+  connection_insight?: string
+  next_steps?: string[]
+  focus_area_insight?: string
+  strengths_insight?: string
+  reflection_prompts?: string[]
 }
 
 interface Connection {
@@ -44,6 +77,7 @@ interface Connection {
 interface UsePredictionResult {
   prediction: Prediction | null
   snapshot: Snapshot | null
+  narrative: AIResponse | null
   connections: Connection[]
   loading: boolean
   error: string | null
@@ -129,9 +163,22 @@ export function usePrediction(predictionId: string | undefined): UsePredictionRe
     fetchData()
   }, [fetchData])
 
+  // Parse AI narrative from JSON string
+  const narrative: AIResponse | null = snapshot?.narrative
+    ? (() => {
+        try {
+          return JSON.parse(snapshot.narrative) as AIResponse
+        } catch {
+          console.error('Failed to parse AI narrative')
+          return null
+        }
+      })()
+    : null
+
   return {
     prediction,
     snapshot,
+    narrative,
     connections,
     loading,
     error,
