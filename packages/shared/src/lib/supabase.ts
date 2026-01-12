@@ -1,5 +1,16 @@
 import { createClient as createSupabaseClient, SupabaseClient } from '@supabase/supabase-js'
 
+// Vite environment type declaration
+declare global {
+  interface ImportMetaEnv {
+    readonly VITE_SUPABASE_URL: string
+    readonly VITE_SUPABASE_ANON_KEY: string
+  }
+  interface ImportMeta {
+    readonly env: ImportMetaEnv
+  }
+}
+
 export type { SupabaseClient } from '@supabase/supabase-js'
 
 /**

@@ -91,19 +91,19 @@ export function Superpowers() {
           icon={<StarIcon />}
           title="Claimed"
           subtitle="what you know"
-          content={superpowersClaimed}
+          content={superpowersClaimed as SuperpowerData}
         />
         <SuperpowerItem
           icon={<SparklesIcon />}
           title="Emerging"
           subtitle="what's developing"
-          content={superpowersEmerging}
+          content={superpowersEmerging as SuperpowerData}
         />
         <SuperpowerItem
           icon={<EyeIcon />}
           title="Hidden"
           subtitle="what others see"
-          content={superpowersHidden}
+          content={superpowersHidden as SuperpowerData}
         />
       </div>
     </div>

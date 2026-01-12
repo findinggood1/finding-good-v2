@@ -6,6 +6,7 @@ import {
   select48HourQuestion,
   generateGrowthOpportunityText,
   type ZoneBreakdown,
+  type Zone,
 } from '@finding-good/shared'
 import type { PredictionFormData } from '../types'
 
@@ -36,7 +37,7 @@ interface AIInput {
  * Calculate zone based on confidence + alignment
  * Combined score of 2-8 maps to zone
  */
-function calculateZone(confidence: number, alignment: number): string {
+function calculateZone(confidence: number, alignment: number): Zone {
   const combined = (confidence || 0) + (alignment || 0)
   if (combined <= 2) return 'Exploring'
   if (combined <= 4) return 'Discovering'

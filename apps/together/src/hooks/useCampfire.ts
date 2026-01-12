@@ -43,7 +43,9 @@ export function useCampfire() {
         }
 
         // Remove self
-        connectedEmails.delete(userEmail)
+        if (userEmail) {
+          connectedEmails.delete(userEmail)
+        }
 
         if (connectedEmails.size === 0) {
           setItems([])

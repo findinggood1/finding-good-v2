@@ -64,7 +64,7 @@ interface CalloutCardProps {
   variant: 'highlight' | 'growth'
 }
 
-function CalloutCard({ title, element, description, variant }: CalloutCardProps) {
+function CalloutCard({ title, element, variant }: CalloutCardProps) {
   if (!element) return null
 
   const color = FIRES_COLORS[element]
