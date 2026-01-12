@@ -1,5 +1,5 @@
 import { LoadingSpinner } from '@finding-good/shared'
-import { PredictionsHeader, FeedCard } from '../components'
+import { PredictionsHeader, FeedCard, ZoneCards, StorySections, Superpowers } from '../components'
 import { usePredictions } from '../hooks/usePredictions'
 import { useFeed } from '../hooks/useFeed'
 
@@ -21,6 +21,15 @@ export function HomePage() {
     <div>
       {/* Predictions Header */}
       <PredictionsHeader predictions={predictions} />
+
+      {/* Zone Cards */}
+      <ZoneCards />
+
+      {/* Story Sections */}
+      <StorySections />
+
+      {/* Superpowers */}
+      <Superpowers />
 
       {/* Feed */}
       <div className="p-4 space-y-3">

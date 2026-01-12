@@ -5,7 +5,7 @@ import { useIsCoach } from '../hooks'
 
 interface AppLayoutProps {
   children: ReactNode
-  activeNav?: 'home' | 'campfire' | 'connections' | 'maps'
+  activeNav?: 'home' | 'campfire' | 'connections' | 'map' | 'maps'
 }
 
 const HomeIcon = () => (
@@ -70,10 +70,10 @@ export function AppLayout({ children, activeNav }: AppLayoutProps) {
       href: '/connections',
     },
     {
-      id: 'maps',
-      label: 'Maps',
+      id: 'map',
+      label: 'My Map',
       icon: <MapsIcon />,
-      href: '/maps',
+      href: '/map',
     },
   ]
 

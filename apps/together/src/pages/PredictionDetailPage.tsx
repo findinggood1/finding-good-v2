@@ -3,10 +3,12 @@ import { useParams, Link } from 'react-router-dom'
 import { getSupabase, useAuth, LoadingSpinner } from '@finding-good/shared'
 import type { Prediction } from '@finding-good/shared'
 import { FeedCard, type FeedItem } from '../components'
+import { useStoryData } from '../hooks'
 
 export function PredictionDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
+  const { goals, challenges, hasEngagement } = useStoryData()
   const [prediction, setPrediction] = useState<Prediction | null>(null)
   const [feedItems, setFeedItems] = useState<FeedItem[]>([])
   const [proofCount, setProofCount] = useState(0)
@@ -146,6 +148,45 @@ export function PredictionDetailPage() {
         >
           Ready to practice predicting
         </a>
+      )}
+
+      {/* Goals & Challenges */}
+      {hasEngagement && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+          {/* Goals */}
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-6 h-6 bg-emerald-50 rounded-md flex items-center justify-center">
+                <svg className="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-medium text-gray-900">Goals</h3>
+            </div>
+            {goals ? (
+              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{goals}</p>
+            ) : (
+              <p className="text-sm text-gray-400 italic">No goals captured yet</p>
+            )}
+          </div>
+
+          {/* Challenges */}
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-6 h-6 bg-amber-50 rounded-md flex items-center justify-center">
+                <svg className="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-sm font-medium text-gray-900">Challenges</h3>
+            </div>
+            {challenges ? (
+              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">{challenges}</p>
+            ) : (
+              <p className="text-sm text-gray-400 italic">No challenges captured yet</p>
+            )}
+          </div>
+        </div>
       )}
 
       {/* Activity */}

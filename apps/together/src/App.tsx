@@ -7,6 +7,7 @@ import {
   ConnectionsPage,
   ConnectionDetailPage,
   MapsPage,
+  MapPage,
   SettingsPage,
   LoginPage,
   AuthCallbackPage,
@@ -75,6 +76,16 @@ function App() {
             <ProtectedRoute>
               <AppLayout activeNav="connections">
                 <ConnectionDetailPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/map"
+          element={
+            <ProtectedRoute>
+              <AppLayout activeNav="map">
+                <MapPage />
               </AppLayout>
             </ProtectedRoute>
           }
