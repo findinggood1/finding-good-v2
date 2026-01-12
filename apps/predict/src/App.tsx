@@ -8,6 +8,7 @@ import {
   ResultsPage,
   LoginPage,
   AuthCallbackPage,
+  AboutPage,
 } from './pages'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/quick" element={<QuickPredictPage />} />
+        <Route path="/about" element={<AboutPage />} />
 
         {/* Protected routes */}
         <Route

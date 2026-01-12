@@ -1,14 +1,28 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth, getSupabase } from '@finding-good/shared'
 import { usePredictions } from '../hooks'
-import { PredictionCard } from '../components'
+import { PredictionCard, WelcomeScreen } from '../components'
+
+const ONBOARDING_KEY = 'predict_onboarding_complete'
 
 export function HomePage() {
   const { userEmail, signOut } = useAuth()
   const { predictions, loading, error, refetch } = usePredictions()
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState<boolean | null>(null)
+
+  // Check if user has completed onboarding
+  useEffect(() => {
+    const hasCompletedOnboarding = localStorage.getItem(ONBOARDING_KEY) === 'true'
+    setShowOnboarding(!hasCompletedOnboarding)
+  }, [])
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem(ONBOARDING_KEY, 'true')
+    setShowOnboarding(false)
+  }
 
   const handleSignOut = async () => {
     await signOut()
@@ -53,18 +67,46 @@ export function HomePage() {
     setDeleteTarget(null)
   }
 
+  // Show loading state while checking onboarding status
+  if (showOnboarding === null) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <svg className="animate-spin h-8 w-8 text-brand-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+    )
+  }
+
+  // Show onboarding for first-time users
+  if (showOnboarding) {
+    return <WelcomeScreen onComplete={handleOnboardingComplete} />
+  }
+
   return (
     <div className="min-h-screen bg-brand-cream">
       {/* Header */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <h1 className="text-xl font-bold text-brand-primary">Predict</h1>
-          <button
-            onClick={handleSignOut}
-            className="text-sm text-gray-500 hover:text-gray-700"
-          >
-            Sign out
-          </button>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/about"
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+              title="About Predict"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </Link>
+            <button
+              onClick={handleSignOut}
+              className="text-sm text-gray-500 hover:text-gray-700"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 

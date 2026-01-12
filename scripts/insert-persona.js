@@ -50,22 +50,37 @@ const PERSONAS = {
       type: 'challenge',
     },
     future_story: {
+      // Text answers
       fs1: 'Issues flow through Mike. Decisions come back down through Mike. I stop getting end-runs to my office about floor problems.',
       fs2: "Relieved. Like I can actually focus on my job instead of putting out fires that aren't mine to put out.",
       fs3: 'Have a direct conversation with Mike about what authority he actually has, and then back him publicly when supervisors try to go around.',
       fs4: "Mike might not be capable. If that's the case I need to know sooner than later. I'll give him 90 days with clear metrics. The other challenge is the supervisors have 10+ years here and Mike has 10 months — they don't respect him yet.",
       fs5: "Directness. Fairness. I'm not going to let tenure override competence but I'm also not going to throw Mike under the bus without giving him a real shot.",
       fs6: "I've done this before. I know how to have hard conversations. I don't avoid conflict when it matters.",
+      // Confidence ratings (1-4)
+      fs1_confidence: 4,
+      fs2_confidence: 3,
+      fs3_confidence: 4,
+      fs4_confidence: 3,
+      fs5_confidence: 4,
+      fs6_confidence: 4,
     },
     past_story: {
+      // Text answers
       ps1: '2019, we merged two shifts after an acquisition. Total chaos for about 3 months — two different cultures, people going around the new structure. Took about 4 months to sort out but we got there.',
       ps2: "Tired. But also like we'd actually built something. The team that came out of it was stronger than either of the original crews.",
       ps3: 'Weekly standups where I made people talk TO each other instead of about each other. Forced the conflicts into the room.',
       ps4: 'One supervisor was actively sabotaging the new structure. Had to let him go. That was hard but it was the right call and everyone knew it.',
       ps5: 'Same as now. Direct communication. Not letting problems fester. And honestly — protecting the people who were trying to make it work.',
       ps6: "Pattern recognition. I could see who was building and who was tearing down. And I'm not afraid to make the call when someone has to go.",
+      // Alignment ratings (1-4)
+      ps1_alignment: 4,
+      ps2_alignment: 3,
+      ps3_alignment: 4,
+      ps4_alignment: 3,
+      ps5_alignment: 4,
+      ps6_alignment: 4,
     },
-    alignment: { q1: 3, q2: 3, q3: 4, q4: 4, q5: 3, q6: 3 },
     future_connections: [
       { name: 'Lisa Huang', relationship: 'Ops Director', support_type: 'She sees everything on the floor. I need her read on whether Mike can actually do this, and I need her to stop enabling the end-runs.' },
       { name: 'Mike Torres', relationship: 'Plant Manager (direct report)', support_type: "He's the one who has to step up. I need to be clear about what I expect and then get out of his way.", working_on_similar: true },
@@ -92,6 +107,12 @@ const PERSONAS = {
       fs4: "My tendency to over-analyze. I'll catch myself going in circles and force a decision even if it's uncomfortable. Also, fear of making the 'wrong' choice — I need to accept there's no perfect answer.",
       fs5: "Authenticity. Growth. I want to do work that actually matters to me, not just what looks good on paper.",
       fs6: "I'm good at seeing all angles of a problem. I'm thorough. I care deeply about doing things right.",
+      fs1_confidence: 2,
+      fs2_confidence: 3,
+      fs3_confidence: 2,
+      fs4_confidence: 4,
+      fs5_confidence: 3,
+      fs6_confidence: 3,
     },
     past_story: {
       ps1: "Choosing to leave my first company after 7 years. It felt impossible at the time — I had built so much there. But I made the leap and it led to everything good that followed.",
@@ -100,8 +121,13 @@ const PERSONAS = {
       ps4: "The guilt of leaving my team. The fear of the unknown. The voice saying 'stay where it's safe.'",
       ps5: "Trusting myself. Believing that I could figure things out even without a perfect plan.",
       ps6: "Resilience — I can handle more uncertainty than I give myself credit for. And relationships — people supported me more than I expected.",
+      ps1_alignment: 4,
+      ps2_alignment: 4,
+      ps3_alignment: 4,
+      ps4_alignment: 4,
+      ps5_alignment: 3,
+      ps6_alignment: 3,
     },
-    alignment: { q1: 4, q2: 3, q3: 2, q4: 4, q5: 2, q6: 3 },
     future_connections: [
       { name: 'Sarah Chen', relationship: 'Mentor', support_type: 'She made a similar transition 5 years ago. I need her honest take on whether consulting is what I think it is.' },
       { name: 'My therapist', relationship: 'Therapist', support_type: 'Helping me separate the anxiety from the actual decision.' },
@@ -128,6 +154,12 @@ const PERSONAS = {
       fs4: "Some people may never trust me again, and I have to accept that. I might lose more people who can't move past this. I'll need to keep showing up consistently even when it feels like it's not working.",
       fs5: "Honesty, even when it's uncomfortable. Loyalty to the people who stayed. Taking responsibility without making excuses.",
       fs6: "I can have hard conversations. I genuinely care about these people, and I think they know that even if they're angry right now.",
+      fs1_confidence: 2,
+      fs2_confidence: 2,
+      fs3_confidence: 3,
+      fs4_confidence: 2,
+      fs5_confidence: 4,
+      fs6_confidence: 3,
     },
     past_story: {
       ps1: "Rebuilding my relationship with my brother after a major falling out. We didn't speak for two years, and now we're closer than ever.",
@@ -136,8 +168,13 @@ const PERSONAS = {
       ps4: "My own pride. The fear that reaching out would be seen as weakness. The uncertainty of not knowing if he'd respond.",
       ps5: "Humility. The relationship mattered more than being right.",
       ps6: "Patience. I can stay committed to something even when progress is slow. And I'm willing to be the one who reaches out first.",
+      ps1_alignment: 2,
+      ps2_alignment: 3,
+      ps3_alignment: 3,
+      ps4_alignment: 3,
+      ps5_alignment: 4,
+      ps6_alignment: 3,
     },
-    alignment: { q1: 2, q2: 2, q3: 3, q4: 4, q5: 2, q6: 2 },
     future_connections: [
       { name: 'Maria Santos', relationship: 'HR Partner', support_type: "She knows the team dynamics better than anyone. I need her to tell me what people are really saying." },
       { name: 'Coach Thompson', relationship: 'Executive Coach', support_type: "Helping me process my own guilt so it doesn't leak into my interactions with the team." },
@@ -164,6 +201,12 @@ const PERSONAS = {
       fs4: "Regional leaders protecting their autonomy. 'This won't work in our culture' pushback. Inconsistent adoption that undermines the whole system. I'll need strong exec sponsorship and local champions who can translate the approach.",
       fs5: "Excellence — if we're going to do this, do it right. Respect — every region has context I need to understand. Persistence — change this big takes longer than anyone wants.",
       fs6: "I know how to build coalitions. I can translate executive vision into operational reality. I stay calm under political pressure.",
+      fs1_confidence: 3,
+      fs2_confidence: 4,
+      fs3_confidence: 4,
+      fs4_confidence: 3,
+      fs5_confidence: 4,
+      fs6_confidence: 4,
     },
     past_story: {
       ps1: "Implementing our new HRIS across the organization two years ago. Similar scale, similar resistance, ultimately successful.",
@@ -172,8 +215,13 @@ const PERSONAS = {
       ps4: "The IT integration was a nightmare. Timeline kept slipping. I had to manage up constantly to keep exec support while managing down to keep the team motivated.",
       ps5: "Transparency about challenges without being defeatist. Celebrating small wins to maintain momentum.",
       ps6: "Stakeholder management — I can read a room and adjust my approach. And endurance — I don't give up when things get hard.",
+      ps1_alignment: 4,
+      ps2_alignment: 3,
+      ps3_alignment: 4,
+      ps4_alignment: 4,
+      ps5_alignment: 4,
+      ps6_alignment: 4,
     },
-    alignment: { q1: 4, q2: 4, q3: 3, q4: 4, q5: 3, q6: 3 },
     future_connections: [
       { name: 'Carlos Mendez', relationship: 'EMEA Regional Director', support_type: "He's the most skeptical regional leader. If I can get him on board, others will follow." },
       { name: 'Janet Liu', relationship: 'APAC HR Lead', support_type: "She's rolled out similar initiatives in Asia before. I need her cultural expertise.", working_on_similar: true },
@@ -201,6 +249,12 @@ const PERSONAS = {
       fs4: "My ego might get in the way — it's hard to admit weakness. The team might not respond well at first if I suddenly change my style. I might overcorrect and overshare.",
       fs5: "Authenticity — no more performing what I think a leader should be. Courage — being real takes more guts than being polished.",
       fs6: "I'm a quick learner. I genuinely want to be better. People tell me I'm likable even when I'm not sure I'm being effective.",
+      fs1_confidence: 2,
+      fs2_confidence: 3,
+      fs3_confidence: 2,
+      fs4_confidence: 3,
+      fs5_confidence: 3,
+      fs6_confidence: 2,
     },
     past_story: {
       ps1: "The one time I was truly vulnerable with my team — when I admitted I had messed up a client relationship — they rallied around me instead of losing respect.",
@@ -209,8 +263,13 @@ const PERSONAS = {
       ps4: "My own fear that admitting mistakes would undermine my authority. The discomfort of not knowing how people would react.",
       ps5: "Honesty — I couldn't pretend the problem wasn't my fault. Trust — I trusted my team to handle the truth.",
       ps6: "Courage to go first. Willingness to be uncomfortable for a good outcome.",
+      ps1_alignment: 3,
+      ps2_alignment: 4,
+      ps3_alignment: 3,
+      ps4_alignment: 3,
+      ps5_alignment: 4,
+      ps6_alignment: 3,
     },
-    alignment: { q1: 3, q2: 3, q3: 2, q4: 4, q5: 2, q6: 2 },
     future_connections: [
       { name: 'Rebecca Mills', relationship: 'Team Lead', support_type: "She's the most honest person on my team. I'll ask her to tell me what people really think of my leadership." },
       { name: 'Executive Coach', relationship: 'Coach', support_type: "Working through why I default to performance mode instead of authenticity." },
@@ -223,32 +282,62 @@ const PERSONAS = {
 }
 
 // ============================================================================
-// CALCULATION FUNCTIONS (same logic as shared package)
+// CALCULATION FUNCTIONS (NEW: confidence + alignment based)
 // ============================================================================
 
-const ZONE_MAP = { 1: 'Exploring', 2: 'Discovering', 3: 'Performing', 4: 'Owning' }
-
-function calculateZone(score) {
-  const clamped = Math.max(1, Math.min(4, Math.round(score)))
-  return ZONE_MAP[clamped] || 'Exploring'
+/**
+ * Calculate zone based on confidence + alignment ratings
+ * Combined score of 2-8 maps to zone
+ */
+function calculateZone(confidence, alignment) {
+  const combined = (confidence || 0) + (alignment || 0)
+  if (combined <= 2) return 'Exploring'
+  if (combined <= 4) return 'Discovering'
+  if (combined <= 6) return 'Performing'
+  return 'Owning'
 }
 
-function calculateZoneBreakdown(alignment) {
+/**
+ * Calculate zone breakdown from confidence and alignment ratings
+ */
+function calculateZoneBreakdown(futureStory, pastStory) {
   return {
-    feelings: calculateZone(alignment.q1),
-    influence: calculateZone(alignment.q2),
-    resilience: calculateZone(alignment.q3),
-    ethics: calculateZone(alignment.q4),
-    strengths: calculateZone(alignment.q5),
+    feelings: calculateZone(futureStory.fs2_confidence, pastStory.ps2_alignment),
+    influence: calculateZone(futureStory.fs3_confidence, pastStory.ps3_alignment),
+    resilience: calculateZone(futureStory.fs4_confidence, pastStory.ps4_alignment),
+    ethics: calculateZone(futureStory.fs5_confidence, pastStory.ps5_alignment),
+    strengths: calculateZone(futureStory.fs6_confidence, pastStory.ps6_alignment),
   }
 }
 
-function calculatePredictabilityScore(alignment, connectionCount) {
-  const scores = Object.values(alignment)
-  const average = scores.reduce((sum, s) => sum + s, 0) / scores.length
-  const baseScore = ((average - 1) / 3) * 100
+/**
+ * Calculate predictability score from ratings and connections
+ */
+function calculatePredictabilityScore(futureStory, pastStory, connectionCount) {
+  const confidenceRatings = [
+    futureStory.fs1_confidence,
+    futureStory.fs2_confidence,
+    futureStory.fs3_confidence,
+    futureStory.fs4_confidence,
+    futureStory.fs5_confidence,
+    futureStory.fs6_confidence,
+  ]
+  const alignmentRatings = [
+    pastStory.ps1_alignment,
+    pastStory.ps2_alignment,
+    pastStory.ps3_alignment,
+    pastStory.ps4_alignment,
+    pastStory.ps5_alignment,
+    pastStory.ps6_alignment,
+  ]
+
+  const confidenceSum = confidenceRatings.reduce((sum, val) => sum + (val || 0), 0)
+  const alignmentSum = alignmentRatings.reduce((sum, val) => sum + (val || 0), 0)
+  const baseScore = confidenceSum + alignmentSum // max 48
+  const normalizedBase = Math.round((baseScore / 48) * 84)
   const connectionBonus = Math.min(connectionCount * 2, 16)
-  return Math.min(Math.round(baseScore + connectionBonus), 100)
+  
+  return Math.min(normalizedBase + connectionBonus, 100)
 }
 
 const ZONE_VALUES = { Exploring: 1, Discovering: 2, Performing: 3, Owning: 4 }
@@ -343,6 +432,8 @@ async function generateAINarrative(snapshotId, input) {
         zone_scores: input.zone_scores,
         growth_opportunity: input.growth_opportunity,
         alignment_scores: input.alignment_scores,
+        confidence_ratings: input.confidence_ratings,
+        alignment_ratings: input.alignment_ratings,
         connections: input.connections,
       }),
     })
@@ -392,10 +483,10 @@ async function insertPersona(personaKey, options = {}) {
 
   console.log(`\n📝 Inserting ${persona.name} (${persona.archetype})...`)
 
-  // Calculate values
+  // Calculate values using new confidence/alignment based system
   const connectionCount = persona.future_connections.length + persona.past_connections.length
-  const zoneBreakdown = calculateZoneBreakdown(persona.alignment)
-  const predictabilityScore = calculatePredictabilityScore(persona.alignment, connectionCount)
+  const zoneBreakdown = calculateZoneBreakdown(persona.future_story, persona.past_story)
+  const predictabilityScore = calculatePredictabilityScore(persona.future_story, persona.past_story, connectionCount)
   const growthElement = selectGrowthOpportunity(zoneBreakdown)
   const growthZone = zoneBreakdown[growthElement]
   const growthOpportunity = generateGrowthOpportunityText(growthElement, growthZone)
@@ -403,6 +494,52 @@ async function insertPersona(personaKey, options = {}) {
 
   // Optional: backdate the record
   const createdAt = options.createdAt || new Date().toISOString()
+
+  // Extract text-only answers for fs/ps_answers (strip ratings)
+  const fsAnswers = {
+    fs1: persona.future_story.fs1,
+    fs2: persona.future_story.fs2,
+    fs3: persona.future_story.fs3,
+    fs4: persona.future_story.fs4,
+    fs5: persona.future_story.fs5,
+    fs6: persona.future_story.fs6,
+  }
+  const psAnswers = {
+    ps1: persona.past_story.ps1,
+    ps2: persona.past_story.ps2,
+    ps3: persona.past_story.ps3,
+    ps4: persona.past_story.ps4,
+    ps5: persona.past_story.ps5,
+    ps6: persona.past_story.ps6,
+  }
+
+  // Extract confidence and alignment ratings
+  const confidenceRatings = {
+    fs1: persona.future_story.fs1_confidence,
+    fs2: persona.future_story.fs2_confidence,
+    fs3: persona.future_story.fs3_confidence,
+    fs4: persona.future_story.fs4_confidence,
+    fs5: persona.future_story.fs5_confidence,
+    fs6: persona.future_story.fs6_confidence,
+  }
+  const alignmentRatings = {
+    ps1: persona.past_story.ps1_alignment,
+    ps2: persona.past_story.ps2_alignment,
+    ps3: persona.past_story.ps3_alignment,
+    ps4: persona.past_story.ps4_alignment,
+    ps5: persona.past_story.ps5_alignment,
+    ps6: persona.past_story.ps6_alignment,
+  }
+
+  // Legacy alignment scores (for backwards compatibility)
+  const legacyAlignmentScores = {
+    q1: alignmentRatings.ps1,
+    q2: alignmentRatings.ps2,
+    q3: alignmentRatings.ps3,
+    q4: alignmentRatings.ps4,
+    q5: alignmentRatings.ps5,
+    q6: alignmentRatings.ps6,
+  }
 
   // 1. Insert prediction
   const { data: prediction, error: predError } = await supabase
@@ -432,11 +569,11 @@ async function insertPersona(personaKey, options = {}) {
     .insert({
       prediction_id: prediction.id,
       client_email: persona.email,
-      goal: persona.future_story.fs1,
-      success: persona.past_story.ps1,
-      fs_answers: persona.future_story,
-      ps_answers: persona.past_story,
-      alignment_scores: persona.alignment,
+      goal: fsAnswers.fs1,
+      success: psAnswers.ps1,
+      fs_answers: fsAnswers,
+      ps_answers: psAnswers,
+      alignment_scores: legacyAlignmentScores,
       zone_scores: zoneBreakdown,
       predictability_score: predictabilityScore,
       growth_opportunity: growthOpportunity,
@@ -502,17 +639,21 @@ async function insertPersona(personaKey, options = {}) {
   console.log(`   Predictability Score: ${predictabilityScore}%`)
   console.log(`   Growth Area: ${growthElement} (${growthZone})`)
   console.log(`   48hr Question: ${question48hr}`)
+  console.log(`   Confidence ratings:`, confidenceRatings)
+  console.log(`   Alignment ratings:`, alignmentRatings)
 
   // 5. Generate AI narrative (unless --skip-ai flag)
   if (!options.skipAI && snapshot?.id) {
     const narrative = await generateAINarrative(snapshot.id, {
-      goal: persona.future_story.fs1,
-      success: persona.past_story.ps1,
-      fs_answers: persona.future_story,
-      ps_answers: persona.past_story,
+      goal: fsAnswers.fs1,
+      success: psAnswers.ps1,
+      fs_answers: fsAnswers,
+      ps_answers: psAnswers,
       zone_scores: zoneBreakdown,
       growth_opportunity: growthOpportunity,
-      alignment_scores: persona.alignment,
+      alignment_scores: legacyAlignmentScores,
+      confidence_ratings: confidenceRatings,
+      alignment_ratings: alignmentRatings,
       connections: {
         future: futureConns,
         past: pastConns,
@@ -521,11 +662,13 @@ async function insertPersona(personaKey, options = {}) {
 
     if (narrative) {
       console.log(`\n🤖 AI Insights Generated:`)
-      console.log(`   Next Steps: ${narrative.next_steps?.[0] || 'N/A'}`)
+      console.log(`   Clarity: ${narrative.clarity_level}`)
+      console.log(`   Confidence: ${narrative.confidence_level}`)
+      console.log(`   Alignment: ${narrative.alignment_level}`)
     }
   }
 
-  return { prediction, snapshot }
+  return { prediction, snapshot, predictionId: prediction.id }
 }
 
 // ============================================================================
@@ -575,7 +718,12 @@ Available personas:
 
   // Insert specific persona
   const personaKey = filteredArgs[0].toLowerCase()
-  await insertPersona(personaKey, { skipAI })
+  const result = await insertPersona(personaKey, { skipAI })
+  
+  if (result?.predictionId) {
+    console.log(`\n🔗 View results: http://localhost:3001/${result.predictionId}/results`)
+  }
+  
   process.exit(0)
 }
 

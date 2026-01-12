@@ -14,6 +14,13 @@ const TYPE_OPTIONS: { value: PredictionType; label: string; description: string 
 export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
   return (
     <div className="space-y-6">
+      {/* Educational intro */}
+      <div className="bg-brand-primary/5 rounded-lg p-4 border border-brand-primary/10">
+        <p className="text-sm text-gray-700">
+          <span className="font-medium text-brand-primary">Predict</span> helps you see how ready you are to achieve something that matters. In about 10 minutes, you'll connect your future vision to past evidence — and get a clear picture of your path forward.
+        </p>
+      </div>
+
       <div>
         <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
           What goal, challenge, or experience are you focused on? <span className="text-red-500">*</span>
@@ -61,7 +68,7 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
           id="description"
           value={data.description}
           onChange={(e) => onChange({ description: e.target.value })}
-          placeholder="Describe your goal in more detail..."
+          placeholder="What's the context? Why does this matter now?"
           rows={4}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary outline-none transition-colors resize-none"
         />

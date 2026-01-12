@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Card, getSupabase, useAuth } from '@finding-good/shared'
+import { Card, getSupabase, useAuth } from '@finding-good/shared'
 import { useAsk } from '../hooks'
 
 interface Prediction {
@@ -17,7 +17,6 @@ export function AskPage() {
   const [requesterName, setRequesterName] = useState('')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [relationship, setRelationship] = useState('')
   const [personalMessage, setPersonalMessage] = useState('')
   const [linkedPredictionId, setLinkedPredictionId] = useState('')
 
@@ -65,7 +64,6 @@ export function AskPage() {
       requesterName,
       recipientName: name,
       recipientEmail: email,
-      relationship: relationship || undefined,
       personalMessage: personalMessage || undefined,
       linkedPredictionId: linkedPredictionId || undefined,
     })
@@ -83,14 +81,16 @@ export function AskPage() {
     }
   }
 
+  const canSubmit = requesterName && name && email && !loading
+
   // Success view
   if (respondUrl) {
     return (
       <div className="min-h-screen bg-brand-cream p-4">
         <div className="max-w-md mx-auto">
           <Card padding="lg" className="text-center">
-            <div className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
@@ -98,7 +98,7 @@ export function AskPage() {
               Invitation Created!
             </h2>
             <p className="text-gray-600 mb-6">
-              Share this link with {name} to invite them to reflect on what's been mattering to them.
+              Share this link with <span className="font-medium">{name}</span> so they can share what matters to them. When they respond, you will both have proof of how they show up.
             </p>
 
             {/* Link display */}
@@ -109,42 +109,36 @@ export function AskPage() {
             </div>
 
             <div className="space-y-3">
-              <Button
-                variant="primary"
-                size="lg"
-                className="w-full"
+              <button
                 onClick={handleCopyLink}
+                className="w-full py-3 px-6 bg-[#0D7C66] hover:bg-[#095c4d] text-white font-semibold rounded-lg transition-colors"
               >
                 {copied ? 'Copied!' : 'Copy Link'}
-              </Button>
+              </button>
 
-              <Button
-                variant="ghost"
-                size="lg"
-                className="w-full"
+              <button
                 onClick={() => {
                   if (navigator.share) {
                     navigator.share({
                       title: 'Share what matters to you',
-                      text: `Hey ${name}, I'd love to hear what's been mattering to you lately. Take a few minutes to reflect and share.`,
+                      text: `Hey ${name}, I would love to hear what has been mattering to you lately. It takes about 2 minutes.`,
                       url: respondUrl,
                     })
                   } else {
                     handleCopyLink()
                   }
                 }}
+                className="w-full py-3 px-6 bg-white text-[#0D7C66] font-semibold rounded-lg border-2 border-[#0D7C66] hover:bg-[#0D7C66] hover:text-white transition-colors"
               >
                 Share Link
-              </Button>
+              </button>
 
-              <Button
-                variant="ghost"
-                size="md"
-                className="w-full text-gray-500"
+              <button
                 onClick={() => navigate('/')}
+                className="w-full py-3 px-6 bg-white text-[#0D7C66] font-semibold rounded-lg border-2 border-[#0D7C66] hover:bg-[#0D7C66] hover:text-white transition-colors"
               >
                 Return Home
-              </Button>
+              </button>
             </div>
 
             <p className="text-sm text-gray-400 mt-6">
@@ -172,15 +166,15 @@ export function AskPage() {
           </button>
         </div>
 
-        <Card padding="lg">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Invite Someone to Share
-          </h2>
-          <p className="text-gray-500 text-sm mb-6">
-            Invite someone to reflect on what's been mattering to them.
-            When they share, you'll both grow your understanding of what matters.
+        {/* Education banner */}
+        <div className="bg-blue-50 rounded-lg p-4 border border-blue-100 mb-6">
+          <h3 className="font-medium text-blue-900 mb-1">Get Inspired by Someone</h3>
+          <p className="text-sm text-blue-800">
+            Ask someone you admire to share what matters to them. They will answer the same questions you did and get their own proof line and insights. You will see how they show up.
           </p>
+        </div>
 
+        <Card padding="lg">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Your name (required) */}
             <div>
@@ -197,12 +191,13 @@ export function AskPage() {
                 disabled={loading}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary outline-none transition-colors disabled:bg-gray-100"
               />
+              <p className="text-xs text-gray-400 mt-1">This is how they will see who invited them</p>
             </div>
 
             {/* Their name (required) */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                Who are you asking?
+                Who do you want to hear from?
               </label>
               <input
                 id="name"
@@ -233,22 +228,6 @@ export function AskPage() {
               />
             </div>
 
-            {/* Relationship (optional) */}
-            <div>
-              <label htmlFor="relationship" className="block text-sm font-medium text-gray-700 mb-1">
-                How do you know them? <span className="text-gray-400 font-normal">(optional)</span>
-              </label>
-              <input
-                id="relationship"
-                type="text"
-                value={relationship}
-                onChange={(e) => setRelationship(e.target.value)}
-                placeholder="e.g., Colleague, Friend, Manager, Mentor"
-                disabled={loading}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary outline-none transition-colors disabled:bg-gray-100"
-              />
-            </div>
-
             {/* Personal message (optional) */}
             <div>
               <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
@@ -258,38 +237,35 @@ export function AskPage() {
                 id="message"
                 value={personalMessage}
                 onChange={(e) => setPersonalMessage(e.target.value)}
-                placeholder="Hey! I'm working on understanding what really matters to me right now and I value your perspective..."
+                placeholder="Hey! I admire how you show up and would love to learn from what matters to you..."
                 rows={3}
                 disabled={loading}
                 className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary outline-none transition-colors resize-none disabled:bg-gray-100"
               />
             </div>
 
-            {/* Link to prediction (optional) */}
-            <div>
-              <label htmlFor="prediction" className="block text-sm font-medium text-gray-700 mb-1">
-                What are you working on? <span className="text-gray-400 font-normal">(optional)</span>
-              </label>
-              <select
-                id="prediction"
-                value={linkedPredictionId}
-                onChange={(e) => setLinkedPredictionId(e.target.value)}
-                disabled={loading || loadingPredictions}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary outline-none transition-colors disabled:bg-gray-100 bg-white"
-              >
-                <option value="">No linked prediction</option>
-                {predictions.map((pred) => (
-                  <option key={pred.id} value={pred.id}>
-                    {pred.title}
-                  </option>
-                ))}
-              </select>
-              {predictions.length === 0 && !loadingPredictions && (
-                <p className="text-xs text-gray-400 mt-1">
-                  No active predictions yet
-                </p>
-              )}
-            </div>
+            {/* Link to prediction (optional) - keep but simplify */}
+            {predictions.length > 0 && (
+              <div>
+                <label htmlFor="prediction" className="block text-sm font-medium text-gray-700 mb-1">
+                  Connect to a goal <span className="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <select
+                  id="prediction"
+                  value={linkedPredictionId}
+                  onChange={(e) => setLinkedPredictionId(e.target.value)}
+                  disabled={loading || loadingPredictions}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary outline-none transition-colors disabled:bg-gray-100 bg-white"
+                >
+                  <option value="">No linked goal</option>
+                  {predictions.map((pred) => (
+                    <option key={pred.id} value={pred.id}>
+                      {pred.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Error display */}
             {error && (
@@ -298,21 +274,22 @@ export function AskPage() {
               </div>
             )}
 
-            <Button
+            <button
               type="submit"
-              variant="primary"
-              size="lg"
-              className="w-full"
-              loading={loading}
-              disabled={loading || !requesterName || !name || !email}
+              disabled={!canSubmit}
+              className={`w-full py-3 px-6 font-semibold rounded-lg transition-colors ${
+                canSubmit
+                  ? 'bg-[#0D7C66] hover:bg-[#095c4d] text-white'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
             >
-              Create Ask Link
-            </Button>
+              {loading ? 'Creating...' : 'Send Invitation'}
+            </button>
           </form>
         </Card>
 
-        <p className="text-center text-sm text-gray-400 mt-6">
-          They'll receive a link to reflect on and share what's been mattering to them.
+        <p className="text-center text-xs text-gray-400 mt-6">
+          They will receive the same 4 questions you answered. When they respond, you will see their proof line and insights.
         </p>
       </div>
     </div>

@@ -13,12 +13,16 @@ interface AskDetails {
 interface FiresExtraction {
   element: 'feelings' | 'influence' | 'resilience' | 'ethics' | 'strengths'
   evidence: string
+  strength?: number
 }
 
 interface AnalysisResult {
   priorityLine: string
   firesElements: FiresExtraction[]
   reflectionInsight: string
+  yourPattern?: string
+  patternQuotes?: string[]
+  validationSignal?: string
 }
 
 type AskStatus = 'loading' | 'valid' | 'expired' | 'already_responded' | 'not_found' | 'error'
@@ -86,6 +90,7 @@ export function useRespond(token: string | undefined) {
   }, [token])
 
   const analyzeResponse = useCallback(async (answers: {
+    focus: string
     whatWentWell: string
     yourPart: string
     impact: string
@@ -94,16 +99,26 @@ export function useRespond(token: string | undefined) {
     setError(null)
 
     try {
-      const supabase = getSupabase()
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
+      const functionUrl = `${supabaseUrl}/functions/v1/priority-analyze`
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
 
-      // Call the priority-analyze edge function
-      const { data, error: fnError } = await supabase.functions.invoke('priority-analyze', {
-        body: answers,
+      // Call the priority-analyze edge function directly
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${anonKey}`,
+        },
+        body: JSON.stringify(answers),
       })
 
-      if (fnError) {
-        throw new Error(fnError.message)
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`Analysis failed: ${errorText}`)
       }
+
+      const data = await response.json()
 
       if (!data.success) {
         throw new Error(data.error || 'Analysis failed')
@@ -111,8 +126,11 @@ export function useRespond(token: string | undefined) {
 
       const result: AnalysisResult = {
         priorityLine: data.priorityLine,
-        firesElements: data.firesElements,
+        firesElements: data.firesElements || [],
         reflectionInsight: data.reflectionInsight,
+        yourPattern: data.yourPattern,
+        patternQuotes: data.patternQuotes,
+        validationSignal: data.validationSignal,
       }
 
       setAnalysisResult(result)
@@ -126,7 +144,12 @@ export function useRespond(token: string | undefined) {
     }
   }, [])
 
-  const submitResponse = useCallback(async (responseText: string): Promise<boolean> => {
+  const submitResponse = useCallback(async (responseData: {
+    focus: string
+    whatWentWell: string
+    yourPart: string
+    impact: string
+  }, analysisResult: AnalysisResult | null): Promise<boolean> => {
     if (!askDetails || !token) {
       setError('Invalid request')
       return false
@@ -138,12 +161,18 @@ export function useRespond(token: string | undefined) {
     try {
       const supabase = getSupabase()
 
-      // Insert the response
+      // Insert the response with structured data
       const { error: insertError } = await supabase
         .from('priority_responses')
         .insert({
           ask_id: askDetails.id,
-          response_text: responseText,
+          response_text: JSON.stringify(responseData),
+          proof_line: analysisResult?.priorityLine || null,
+          fires_extracted: analysisResult?.firesElements ? 
+            analysisResult.firesElements.reduce((acc, fe) => {
+              acc[fe.element] = { present: true, evidence: fe.evidence, strength: fe.strength || 3 }
+              return acc
+            }, {} as Record<string, unknown>) : null,
         })
 
       if (insertError) {

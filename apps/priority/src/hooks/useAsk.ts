@@ -16,7 +16,7 @@ interface AskResult {
 }
 
 export function useAsk() {
-  const { user } = useAuth()
+  const { user, userEmail } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -44,6 +44,7 @@ export function useAsk() {
         .from('priority_asks')
         .insert({
           user_id: user.id,
+          requester_email: userEmail,
           token,
           requester_name: request.requesterName,
           recipient_name: request.recipientName,
@@ -69,7 +70,7 @@ export function useAsk() {
       setLoading(false)
       return null
     }
-  }, [user])
+  }, [user, userEmail])
 
   return {
     createAsk,

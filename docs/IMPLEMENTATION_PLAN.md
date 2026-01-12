@@ -195,17 +195,96 @@ CREATE POLICY "Users can delete own connections"
 
 ---
 
-## Phase 4: Together App
+## Phase 4: Together App (Complete)
 
-### 4a: App Shell
-- Tailwind CSS setup
+### 5a: App Shell Setup (Complete)
+- Vite + React + TypeScript configuration
+- Tailwind CSS setup with brand colors
 - AuthProvider integration
-- Basic routing
+- Running on port 3003
 
-### 4b: Dashboard View
-- Prediction overview
-- FIRES breakdown visualization
-- Connection graph
+### 5b: Routing (Complete)
+Routes configured:
+- `/` - Home (predictions header + feed)
+- `/prediction/:id` - Prediction Detail
+- `/campfire` - Campfire feed
+- `/connections` - Connections list
+- `/connection/:id` - Connection Detail
+- `/maps` - Integrity Maps
+- `/settings` - Settings
+- `/login` - Public login
+- `/auth/callback` - Auth callback
+
+### 5c: Navigation Shell (Complete)
+- Bottom navigation with 4 items: Home, Campfire, Connections, Maps
+- Top bar with settings access
+- AppLayout wrapper component
+- All routes protected except login and auth callback
+
+### 5d: Components (Complete)
+- PredictionsHeader - Horizontal scrolling prediction cards with scores
+- FeedCard - Priority/Proof/Share cards with FIRES badges
+- AppLayout - Page wrapper with bottom nav
+
+### 5e: Hooks (Complete)
+- usePredictions - Fetch user's predictions from predictions table
+- useFeed - Fetch proofs for activity feed from validations table
+- useConnections - Fetch connections from share_visibility table
+- useCampfire - Fetch connections' shares from inspiration_shares
+- useIntegrityMaps - Fetch, generate, and display integrity maps
+- useIsCoach - Check if user is a coach via coaches table
+- useCoachClients - Fetch coach's clients from coaching_engagements
+- useClientDetail - Fetch detailed client data for coach view
+- useCoachingSessions - CRUD for coaching sessions with transcripts and AI summaries
+- useClientDocuments - Upload/manage client documents with Supabase storage
+
+### 5f: Core Screens (Complete)
+- **HomePage** - Predictions header + activity feed with empty states
+- **PredictionDetailPage** - Stats, counts, filtered activity, action buttons
+- **CampfirePage** - Connections' shares from inspiration_shares table
+- **ConnectionsPage** - Circle from share_visibility (Mutual/You Invited/Invited You)
+- **ConnectionDetailPage** - Connection info, shares, notes, actions
+- **MapsPage** - Integrity map generation with FIRES patterns, wins, focus areas
+- **SettingsPage** - Account info + sign out
+- **LoginPage** - Magic link authentication
+- **AuthCallbackPage** - OAuth callback handler
+
+### 5g: Empty States (Complete)
+All screens have appropriate empty states per Dashboard Specification
+
+### 5h: Database Tables (Complete)
+Migration: `supabase/migrations/20260111_social_features.sql`
+- `share_visibility` - Tracks connections between users
+- `inspiration_shares` - Stores shared priorities/proofs for Campfire
+- `integrity_maps` - Weekly AI-generated clarity snapshots
+
+Migration: `supabase/migrations/20260111_coach_sessions_documents.sql`
+- `coaching_sessions` - Session records with transcripts, AI summaries, notes
+- `client_documents` - Uploaded documents (PDFs, assessments, notes)
+
+### 5i: Coach Views (Complete)
+Routes configured:
+- `/coach/clients` - Coach dashboard with client list
+- `/coach/client/:email` - Client detail with predictions, activity, FIRES signals
+- `/coach/prepare` - Session preparation (placeholder)
+- `/coach/practice` - My Practice with journey/coaching toggle (placeholder)
+- `/coach/admin` - Admin dashboard (placeholder)
+
+Components:
+- CoachLayout - Bottom nav with Clients, Prepare, My Practice, Admin
+- Coach icon in AppLayout top bar for users in coaches table
+
+Screens:
+- **ClientsPage** - List of coached clients with engagement info, activity alerts
+- **ClientDetailPage** - Full client management:
+  - Predictions with scores
+  - Recent activity feed
+  - FIRES signals visualization
+  - Sessions section (add/view sessions, transcript upload, AI summary generation)
+  - Documents section (upload/view/delete PDFs, notes, assessments)
+- **PreparePage** - Placeholder for AI session prep
+- **MyPracticePage** - Toggle between personal journey and coaching practice analysis
+- **AdminPage** - Placeholder for system metrics and data health
 
 ---
 

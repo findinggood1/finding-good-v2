@@ -29,7 +29,13 @@ interface Snapshot {
   created_at: string
 }
 
-// New narrative format (v3)
+// Network supporter summary
+interface NetworkSupporter {
+  name: string
+  role: string
+}
+
+// AI Narrative Response (v3 structured format with backwards compatibility)
 export interface AIResponse {
   // Core assessments
   clarity_level?: 'strong' | 'building' | 'emerging'
@@ -39,17 +45,34 @@ export interface AIResponse {
   alignment_level?: 'strong' | 'building' | 'emerging'
   alignment_rationale?: string
   
-  // Pattern insight
+  // Pattern section (NEW v3 structured)
+  pattern_name?: string
+  pattern_quotes?: string[]
+  pattern_curiosity?: string
+  
+  // Pattern section (OLD v2 single field - fallback)
   pattern_insight?: string
   
-  // Edge insight
+  // Edge section (NEW v3 structured)
+  edge_element?: string
+  edge_why?: string
+  edge_gap_future?: string
+  edge_gap_past?: string
+  edge_meaning?: string
+  
+  // Edge section (OLD v2 - fallback)
   edge_insight?: string
   edge_question?: string
   
-  // Network
+  // Network section (NEW v3 structured)
+  network_summary?: NetworkSupporter[]
+  network_why?: string
+  network_who_else?: string
+  
+  // Network section (OLD v2 - fallback)
   network_insight?: string
   
-  // Legacy format support (v1/v2)
+  // Legacy format support (v1)
   future_story_insight?: string
   past_story_insight?: string
   alignment_insight?: string

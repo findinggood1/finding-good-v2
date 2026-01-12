@@ -13,7 +13,6 @@ const ZONE_VALUES: Record<string, number> = {
   'Owning': 4,
 }
 
-// Categorize zones into clarity/confidence levels
 function categorizeZones(zoneScores: Record<string, string> | null) {
   if (!zoneScores) return { solid: [], building: [], edge: null }
   
@@ -39,13 +38,11 @@ function categorizeZones(zoneScores: Record<string, string> | null) {
     }
   }
   
-  // Remove edge from building if it's there
   const buildingFiltered = building.filter(e => e !== edge)
   
   return { solid, building: buildingFiltered, edge }
 }
 
-// Calculate clarity/confidence/alignment component display
 function getLevelDisplay(level: string | undefined) {
   switch (level) {
     case 'strong': return { label: 'Strong', width: '85%', color: 'bg-green-500' }
@@ -62,7 +59,6 @@ export function ResultsPage() {
   const [regenerating, setRegenerating] = useState(false)
   const [regenerateError, setRegenerateError] = useState<string | null>(null)
 
-  // Regenerate AI insights
   const regenerateInsights = useCallback(async () => {
     if (!snapshot) return
     
@@ -166,10 +162,14 @@ export function ResultsPage() {
   const isAnalysisPending = snapshot?.predictability_score === null || snapshot?.predictability_score === undefined
   const isNarrativePending = !isAnalysisPending && !narrative
 
-  // Get clarity/confidence/alignment levels from narrative
   const clarityDisplay = getLevelDisplay(narrative?.clarity_level)
   const confidenceDisplay = getLevelDisplay(narrative?.confidence_level)
   const alignmentDisplay = getLevelDisplay(narrative?.alignment_level)
+
+  // Check if we have the new structured format
+  const hasStructuredPattern = narrative?.pattern_name && narrative?.pattern_quotes
+  const hasStructuredEdge = narrative?.edge_why && narrative?.edge_meaning
+  const hasStructuredNetwork = narrative?.network_summary && narrative?.network_why
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -188,9 +188,7 @@ export function ResultsPage() {
 
       <main className="max-w-lg mx-auto px-4 py-6 space-y-4">
         
-        {/* ============================================ */}
         {/* SECTION 1: THE GOAL */}
-        {/* ============================================ */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
           <div className="flex items-center gap-2 mb-2">
             <span className="inline-block px-2.5 py-0.5 text-xs font-semibold bg-brand-primary/10 text-brand-primary rounded capitalize">
@@ -210,9 +208,7 @@ export function ResultsPage() {
           )}
         </div>
 
-        {/* ============================================ */}
         {/* SECTION 2: PREDICTABILITY SCORE */}
-        {/* ============================================ */}
         {isAnalysisPending ? (
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-5">
             <div className="flex items-center gap-3">
@@ -236,7 +232,10 @@ export function ResultsPage() {
                 {snapshot?.predictability_score}%
               </div>
               <p className="text-sm text-gray-500">
-                How ready you are to see where you're going
+                How clearly you can see your path forward
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                Most people start between 55-70%
               </p>
             </div>
             
@@ -298,9 +297,7 @@ export function ResultsPage() {
           </div>
         )}
 
-        {/* ============================================ */}
         {/* SECTION 3: GENERATE INSIGHTS (if missing) */}
-        {/* ============================================ */}
         {isNarrativePending && (
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-5">
             <div className="flex items-center justify-between">
@@ -339,10 +336,43 @@ export function ResultsPage() {
           </div>
         )}
 
-        {/* ============================================ */}
-        {/* SECTION 4: WHAT YOUR STORIES REVEAL (Pattern) */}
-        {/* ============================================ */}
-        {narrative?.pattern_insight && (
+        {/* SECTION 4: WHAT YOUR STORIES REVEAL (Pattern) - NEW STRUCTURED FORMAT */}
+        {narrative && (hasStructuredPattern ? (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+              What Your Stories Reveal
+            </p>
+            
+            {/* Your Pattern */}
+            <div className="mb-4">
+              <p className="text-xs text-gray-400 mb-1">Your Pattern</p>
+              <p className="text-lg font-semibold text-gray-900">{narrative.pattern_name}</p>
+            </div>
+            
+            {/* In Your Words */}
+            {narrative.pattern_quotes && narrative.pattern_quotes.length > 0 && (
+              <div className="mb-4">
+                <p className="text-xs text-gray-400 mb-2">In Your Words</p>
+                <div className="space-y-2">
+                  {narrative.pattern_quotes.map((quote, i) => (
+                    <p key={i} className="text-sm text-gray-700 italic border-l-2 border-brand-primary/30 pl-3">
+                      "{quote}"
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Where Curiosity Helps */}
+            {narrative.pattern_curiosity && (
+              <div className="pt-3 border-t border-gray-100">
+                <p className="text-xs text-gray-400 mb-1">Where Curiosity Helps</p>
+                <p className="text-sm text-gray-600">{narrative.pattern_curiosity}</p>
+              </div>
+            )}
+          </div>
+        ) : narrative.pattern_insight ? (
+          // Fallback to old format
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
               What Your Stories Reveal
@@ -351,11 +381,9 @@ export function ResultsPage() {
               {narrative.pattern_insight}
             </p>
           </div>
-        )}
+        ) : null)}
 
-        {/* ============================================ */}
         {/* SECTION 5: WHERE YOU STAND (FIRES grouping) */}
-        {/* ============================================ */}
         {snapshot?.zone_scores && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">
@@ -423,10 +451,62 @@ export function ResultsPage() {
           </div>
         )}
 
-        {/* ============================================ */}
-        {/* SECTION 6: YOUR EDGE (detailed insight) */}
-        {/* ============================================ */}
-        {edge && narrative?.edge_insight && (
+        {/* SECTION 6: YOUR EDGE (detailed insight) - NEW STRUCTURED FORMAT */}
+        {edge && narrative && (hasStructuredEdge ? (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-5">
+            <div className="flex items-start gap-3">
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                style={{ backgroundColor: FIRES_COLORS[edge] }}
+              >
+                {edge.charAt(0).toUpperCase()}
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">
+                  Your Edge: {FIRES_LABELS[edge]}
+                </p>
+                
+                {/* Why This Matters */}
+                <p className="text-sm font-medium text-gray-900 mb-3">
+                  {narrative.edge_why}
+                </p>
+                
+                {/* The Gap */}
+                <div className="bg-white/50 rounded-lg p-3 mb-3">
+                  <p className="text-xs text-gray-500 mb-2">The Gap</p>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <span className="text-xs text-gray-400">Future: </span>
+                      <span className="text-gray-700 italic">"{narrative.edge_gap_future}"</span>
+                    </div>
+                    <div>
+                      <span className="text-xs text-gray-400">Past: </span>
+                      <span className="text-gray-700 italic">"{narrative.edge_gap_past}"</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* What This Means */}
+                <p className="text-sm text-gray-700 mb-4">
+                  {narrative.edge_meaning}
+                </p>
+
+                {/* Question */}
+                {narrative.edge_question && (
+                  <div className="pt-3 border-t border-amber-200">
+                    <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-1">
+                      Question to Consider
+                    </p>
+                    <p className="text-gray-900 font-medium">
+                      {narrative.edge_question}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : narrative.edge_insight ? (
+          // Fallback to old format
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-5">
             <div className="flex items-start gap-3">
               <div
@@ -439,11 +519,9 @@ export function ResultsPage() {
                 <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-1">
                   Your Edge: {FIRES_LABELS[edge]}
                 </p>
-                
                 <p className="text-sm text-gray-700 mt-2 leading-relaxed">
                   {narrative.edge_insight}
                 </p>
-
                 {narrative.edge_question && (
                   <div className="mt-4 pt-4 border-t border-amber-200">
                     <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-1">
@@ -457,46 +535,76 @@ export function ResultsPage() {
               </div>
             </div>
           </div>
-        )}
+        ) : null)}
 
-        {/* ============================================ */}
-        {/* SECTION 7: WHO'S IN THIS WITH YOU */}
-        {/* ============================================ */}
+        {/* SECTION 7: WHO'S IN THIS WITH YOU - NEW STRUCTURED FORMAT */}
         {(futureConnections.length > 0 || pastConnections.length > 0) && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
               Who's In This With You
             </p>
             
-            {futureConnections.length > 0 && (
-              <div className="mb-3">
-                <p className="text-xs text-gray-400 mb-1">Future</p>
-                <p className="text-sm text-gray-700">
-                  {futureConnections.map(c => c.name).join(', ')}
-                </p>
+            <p className="text-sm text-gray-600 mb-4">
+              Your Supporters ({totalConnections} of 8)
+            </p>
+
+            {/* Structured supporter list */}
+            {hasStructuredNetwork && narrative.network_summary ? (
+              <div className="bg-gray-50 rounded-lg p-3 mb-4">
+                <div className="grid gap-2">
+                  {narrative.network_summary.map((supporter, i) => (
+                    <div key={i} className="flex items-center justify-between text-sm">
+                      <span className="font-medium text-gray-900">{supporter.name}</span>
+                      <span className="text-gray-500 text-xs">{supporter.role}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            )}
-            
-            {pastConnections.length > 0 && (
-              <div className="mb-3">
-                <p className="text-xs text-gray-400 mb-1">Past</p>
-                <p className="text-sm text-gray-700">
-                  {pastConnections.map(c => c.name).join(', ')}
-                </p>
+            ) : (
+              // Fallback to simple list
+              <div className="space-y-3 mb-4">
+                {futureConnections.length > 0 && (
+                  <div>
+                    <p className="text-xs text-gray-400 mb-1">Future</p>
+                    <p className="text-sm text-gray-700">
+                      {futureConnections.map(c => c.name).join(', ')}
+                    </p>
+                  </div>
+                )}
+                {pastConnections.length > 0 && (
+                  <div>
+                    <p className="text-xs text-gray-400 mb-1">Past</p>
+                    <p className="text-sm text-gray-700">
+                      {pastConnections.map(c => c.name).join(', ')}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
 
-            {narrative?.network_insight && (
-              <p className="text-sm text-gray-600 mt-3 pt-3 border-t border-gray-100">
+            {/* Why They Matter */}
+            {hasStructuredNetwork && narrative.network_why && (
+              <div className="mb-3">
+                <p className="text-xs text-gray-400 mb-1">Why They Matter</p>
+                <p className="text-sm text-gray-600">{narrative.network_why}</p>
+              </div>
+            )}
+
+            {/* Who Else */}
+            {hasStructuredNetwork && narrative.network_who_else ? (
+              <div className="pt-3 border-t border-gray-100">
+                <p className="text-xs text-gray-400 mb-1">Who Else?</p>
+                <p className="text-sm text-gray-600">{narrative.network_who_else}</p>
+              </div>
+            ) : narrative?.network_insight ? (
+              <p className="text-sm text-gray-600 pt-3 border-t border-gray-100">
                 {narrative.network_insight}
               </p>
-            )}
+            ) : null}
           </div>
         )}
 
-        {/* ============================================ */}
         {/* SECTION 8: WHAT THIS SETS UP */}
-        {/* ============================================ */}
         <div className="bg-gray-100 rounded-lg p-5">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
             This Snapshot Sets Your Focus
@@ -516,9 +624,7 @@ export function ResultsPage() {
           </p>
         </div>
 
-        {/* ============================================ */}
         {/* SECTION 9: VIEW FULL DETAILS */}
-        {/* ============================================ */}
         <button
           onClick={() => setShowFullDetails(!showFullDetails)}
           className="w-full py-3 text-sm font-medium text-gray-500 hover:text-gray-700 flex items-center justify-center gap-2"
@@ -716,9 +822,7 @@ export function ResultsPage() {
           </div>
         )}
 
-        {/* ============================================ */}
         {/* SECTION 10: BACK BUTTON */}
-        {/* ============================================ */}
         <div className="pt-4">
           <Link
             to="/"

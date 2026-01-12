@@ -16,6 +16,8 @@ interface SnapshotInput {
   zone_scores: Record<string, string>
   growth_opportunity: string
   alignment_scores: Record<string, number>
+  confidence_ratings?: Record<string, number>
+  alignment_ratings?: Record<string, number>
   connections?: {
     future: Array<{ name: string; involvement_type?: string }>
     past: Array<{ name: string; how_involved?: string }>
@@ -23,6 +25,7 @@ interface SnapshotInput {
 }
 
 interface NarrativeOutput {
+  // Score rationales
   clarity_level: 'strong' | 'building' | 'emerging'
   clarity_rationale: string
   confidence_level: 'strong' | 'building' | 'emerging'
@@ -30,17 +33,28 @@ interface NarrativeOutput {
   alignment_level: 'strong' | 'building' | 'emerging'
   alignment_rationale: string
   
-  pattern_insight: string
+  // Pattern section (structured)
+  pattern_name: string
+  pattern_quotes: string[]
+  pattern_curiosity: string
   
-  edge_insight: string
+  // Edge section (structured)
+  edge_element: string
+  edge_why: string
+  edge_gap_future: string
+  edge_gap_past: string
+  edge_meaning: string
   edge_question: string
   
-  network_insight: string
+  // Network section (structured)
+  network_summary: Array<{ name: string; role: string }>
+  network_why: string
+  network_who_else: string
 }
 
 function buildPrompt(input: SnapshotInput): string {
   const fsLabels: Record<string, string> = {
-    fs1: 'What success looks like',
+    fs1: 'What success looks like (Goal)',
     fs2: 'How you will feel (Feelings)',
     fs3: 'Key action/influence (Influence)',
     fs4: 'Challenges and how to overcome (Resilience)',
@@ -58,11 +72,19 @@ function buildPrompt(input: SnapshotInput): string {
   }
 
   const futureStory = Object.entries(input.fs_answers)
-    .map(([key, value]) => `${fsLabels[key] || key}: "${value}"`)
+    .map(([key, value]) => {
+      const confRating = input.confidence_ratings?.[key] || 0
+      const confLabel = confRating ? ` [Confidence: ${confRating}/4]` : ''
+      return `${fsLabels[key] || key}: "${value}"${confLabel}`
+    })
     .join('\n')
 
   const pastStory = Object.entries(input.ps_answers)
-    .map(([key, value]) => `${psLabels[key] || key}: "${value}"`)
+    .map(([key, value]) => {
+      const alignRating = input.alignment_ratings?.[key] || 0
+      const alignLabel = alignRating ? ` [Alignment: ${alignRating}/4]` : ''
+      return `${psLabels[key] || key}: "${value}"${alignLabel}`
+    })
     .join('\n')
 
   const zones = Object.entries(input.zone_scores)
@@ -89,15 +111,28 @@ function buildPrompt(input: SnapshotInput): string {
 
   const growthFutureAnswer = input.fs_answers[elementToFsKey[growthElement]] || ''
   const growthPastAnswer = input.ps_answers[elementToPsKey[growthElement]] || ''
+  const growthConfidence = input.confidence_ratings?.[elementToFsKey[growthElement]] || 0
+  const growthAlignment = input.alignment_ratings?.[elementToPsKey[growthElement]] || 0
 
-  const futureNames = input.connections?.future?.map(c => c.name) || []
-  const pastNames = input.connections?.past?.map(c => c.name) || []
-  const totalConnections = futureNames.length + pastNames.length
+  const totalConnections = (input.connections?.future?.length || 0) + (input.connections?.past?.length || 0)
 
   const connectionDetails = input.connections
     ? `Future supporters: ${input.connections.future.map(c => `${c.name}${c.involvement_type ? ` (${c.involvement_type})` : ''}`).join(', ') || 'None'}
 Past supporters: ${input.connections.past.map(c => `${c.name}${c.how_involved ? ` (${c.how_involved})` : ''}`).join(', ') || 'None'}`
     : 'No connections provided'
+
+  const avgConfidence = input.confidence_ratings 
+    ? Object.values(input.confidence_ratings).reduce((a, b) => a + (b || 0), 0) / 6
+    : 2
+  const avgAlignment = input.alignment_ratings
+    ? Object.values(input.alignment_ratings).reduce((a, b) => a + (b || 0), 0) / 6
+    : 2
+
+  // Build connection list for structured output
+  const allConnections = [
+    ...(input.connections?.future || []).map(c => ({ name: c.name, context: c.involvement_type || '' })),
+    ...(input.connections?.past || []).map(c => ({ name: c.name, context: c.how_involved || '' })),
+  ]
 
   return `You are helping someone see patterns in their own thinking about a goal. Your job is to MIRROR what they wrote, help them see their clarity and confidence, and show where curiosity can help them increase their INFLUENCE.
 
@@ -107,59 +142,75 @@ THE PREDICT TOOL FRAMEWORK:
 - CLARITY: Can you articulate what matters simply and specifically?
 - CONFIDENCE: Do you have evidence from past experience you can repeat?
 - ALIGNMENT: Does your past approach map to your future vision?
-- INFLUENCE: The outcome of clarity + confidence + alignment — the ability to predictably create outcomes with and through others
-
-The goal is to help them see how their priorities (what matters) and proof (what they've done) create predictability — and ultimately influence.
+- INFLUENCE: The outcome of clarity + confidence + alignment
 
 THEIR GOAL: ${input.goal}
 
 THEIR PAST SUCCESS: ${input.success || 'Not provided'}
 
-FUTURE STORY:
+FUTURE STORY (with self-rated confidence):
 ${futureStory}
 
-PAST STORY:
+PAST STORY (with self-rated alignment to future):
 ${pastStory}
 
-FIRES ZONE ASSESSMENT (based on their alignment ratings):
+FIRES ZONE ASSESSMENT:
 ${zones}
 
-ALIGNMENT OPPORTUNITY (lowest alignment): ${growthElement}
-- Future response for ${growthElement}: "${growthFutureAnswer}"
-- Past response for ${growthElement}: "${growthPastAnswer}"
+ALIGNMENT OPPORTUNITY (lowest zone): ${growthElement}
+- Future response: "${growthFutureAnswer}" [Confidence: ${growthConfidence}/4]
+- Past response: "${growthPastAnswer}" [Alignment: ${growthAlignment}/4]
 
-SUPPORT NETWORK (${totalConnections} of 8 possible):
+SUPPORT NETWORK (${totalConnections} of 8):
 ${connectionDetails}
 
 ---
 
-Provide analysis in this JSON format. Use "you/your" language throughout — speak directly to them:
+Provide analysis in this EXACT JSON structure:
 
 {
   "clarity_level": "strong" | "building" | "emerging",
-  "clarity_rationale": "One sentence explaining their clarity level, quoting their specific language that shows clarity (or lack of it)",
+  "clarity_rationale": "One sentence about their clarity with a specific quote from their responses.",
   
-  "confidence_level": "strong" | "building" | "emerging", 
-  "confidence_rationale": "One sentence explaining their confidence level, referencing whether they provided process/evidence they can repeat",
+  "confidence_level": "strong" | "building" | "emerging",
+  "confidence_rationale": "One sentence about their confidence based on their past evidence.",
   
   "alignment_level": "strong" | "building" | "emerging",
-  "alignment_rationale": "One sentence showing how their past approach does/doesn't map to future vision, with specific quotes",
+  "alignment_rationale": "One sentence about how past maps to future with specific quotes.",
   
-  "pattern_insight": "2-4 sentences that: (1) Quote specific phrases showing where you HAVE clarity and confidence, (2) Name the pattern — what approach do you naturally take that works? (3) Show where curiosity about your own process could deepen your influence. Use their actual words in quotes. Focus on strengths first, then opportunity.",
+  "pattern_name": "A short phrase (3-7 words) naming what they naturally do well. Example: 'Creating order through direct confrontation' or 'Turning skeptics into advocates'",
   
-  "edge_insight": "2-3 sentences about ${growthElement} as their biggest ALIGNMENT opportunity. Structure: (1) 'This is your biggest area for alignment.' (2) Quote their future and past responses to show the gap or disconnect. (3) Suggest how finding more proof here (through daily prioritize practice) can help them fully realize their influence. Be specific to what they wrote.",
+  "pattern_quotes": ["Exact quote from their response", "Another exact quote"],
   
-  "edge_question": "One reflective question that helps them find more proof or clarity in ${growthElement}. Frame it as an opportunity to strengthen alignment, not fix a weakness.",
+  "pattern_curiosity": "One sentence about where curiosity could deepen their influence.",
   
-  "network_insight": "2-3 sentences about their ${totalConnections} supporters. (1) Name who they identified and acknowledge what these people offer. (2) Show how engaging these people helps clarity (they witness your priorities) and connection (shared understanding). (3) Note that growing to 8 supporters increases predictability — who else has seen you do this? Frame network as amplifier of influence."
+  "edge_element": "${growthElement}",
+  
+  "edge_why": "One sentence: why ${growthElement} is their biggest alignment opportunity for THIS specific goal.",
+  
+  "edge_gap_future": "Their exact future response for ${growthElement}, quoted.",
+  
+  "edge_gap_past": "Their exact past response for ${growthElement}, quoted.",
+  
+  "edge_meaning": "1-2 sentences explaining what the gap between future and past means for their goal, and how finding more proof through daily practice helps.",
+  
+  "edge_question": "One specific reflective question about ${growthElement} that helps them find more proof or clarity.",
+  
+  "network_summary": [
+    {"name": "Person Name", "role": "2-4 word description of what they bring"},
+    ...for each connection
+  ],
+  
+  "network_why": "One sentence about how engaging these people builds clarity and predictability.",
+  
+  "network_who_else": "One sentence asking who else has seen them do this, specific to their goal."
 }
 
-CRITICAL:
-- Use "you/your" not "they/their"
-- Quote their actual words
-- Frame everything as building toward INFLUENCE (the outcome of clarity + confidence + alignment)
-- The edge is an ALIGNMENT OPPORTUNITY, not a weakness
-- Show how daily practice (Priority Builder) and proof-gathering (Prove Tool) connect to influence
+CRITICAL RULES:
+- Use "you/your" language throughout
+- pattern_quotes must be EXACT phrases from their responses in quotation marks
+- edge_gap_future and edge_gap_past should be their actual words
+- network_summary should include ALL ${totalConnections} supporters they named
 - Be warm, direct, specific — not corporate or generic
 
 Respond ONLY with the JSON object.`
@@ -175,7 +226,7 @@ async function callClaudeAPI(prompt: string, apiKey: string): Promise<NarrativeO
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
+      max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }],
     }),
   })

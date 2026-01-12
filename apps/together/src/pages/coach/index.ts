@@ -1,0 +1,5 @@
+export { ClientsPage } from './ClientsPage'
+export { ClientDetailPage } from './ClientDetailPage'
+export { PreparePage } from './PreparePage'
+export { MyPracticePage } from './MyPracticePage'
+export { AdminPage } from './AdminPage'

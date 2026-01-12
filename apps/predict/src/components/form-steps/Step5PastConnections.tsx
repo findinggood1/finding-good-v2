@@ -38,9 +38,16 @@ export function Step5PastConnections({ data, onChange }: Step5PastConnectionsPro
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-gray-600">
-        Who was involved in your past success? Add up to {MAX_CONNECTIONS} people.
-      </p>
+      {/* Educational intro */}
+      <div className="bg-purple-50 rounded-lg p-4 border border-purple-100">
+        <p className="text-sm font-medium text-purple-900 mb-1">Past Supporters</p>
+        <p className="text-sm text-purple-800">
+          Who helped you succeed before? Recognizing the people who were part of your past wins helps you see patterns in who supports you best — and reminds you that you don't do this alone.
+        </p>
+        <p className="text-xs text-purple-600 mt-2">
+          You can add up to {MAX_CONNECTIONS} people from your past success.
+        </p>
+      </div>
 
       {connections.length === 0 && (
         <div className="text-center py-8 bg-gray-50 rounded-xl">
@@ -93,7 +100,7 @@ export function Step5PastConnections({ data, onChange }: Step5PastConnectionsPro
             <textarea
               value={conn.how_they_supported}
               onChange={(e) => updateConnection(index, { how_they_supported: e.target.value })}
-              placeholder="They were involved by..."
+              placeholder="What role did they play in your success?"
               rows={2}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary outline-none resize-none"
             />

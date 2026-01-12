@@ -41,9 +41,16 @@ export function Step3FutureConnections({ data, onChange }: Step3FutureConnection
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-gray-600">
-        Who can be involved in helping you achieve this goal? Add up to {MAX_CONNECTIONS} people.
-      </p>
+      {/* Educational intro */}
+      <div className="bg-green-50 rounded-lg p-4 border border-green-100">
+        <p className="text-sm font-medium text-green-900 mb-1">Future Supporters</p>
+        <p className="text-sm text-green-800">
+          Who will be part of this journey? Goals shared with others are significantly more likely to be achieved. These aren't just helpers — they're witnesses to your priorities.
+        </p>
+        <p className="text-xs text-green-600 mt-2">
+          Each supporter adds to your predictability score. You can add up to {MAX_CONNECTIONS} people here.
+        </p>
+      </div>
 
       {connections.length === 0 && (
         <div className="text-center py-8 bg-gray-50 rounded-xl">
@@ -105,13 +112,13 @@ export function Step3FutureConnections({ data, onChange }: Step3FutureConnection
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                How They'll Be Involved
+                How They'll Help
               </label>
               <input
                 type="text"
                 value={conn.support_type}
                 onChange={(e) => updateConnection(index, { support_type: e.target.value })}
-                placeholder="e.g., Advice, Collaboration, Accountability"
+                placeholder="e.g., Advice, Accountability"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary outline-none"
               />
             </div>

@@ -8,6 +8,8 @@ import {
   HistoryPage,
   LoginPage,
   AuthCallbackPage,
+  AboutPage,
+  RecognizePage,
 } from './pages'
 
 function App() {
@@ -18,6 +20,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/respond/:token" element={<RespondPage />} />
+        <Route path="/about" element={<AboutPage />} />
 
         {/* Protected routes */}
         <Route
@@ -49,6 +52,14 @@ function App() {
           element={
             <ProtectedRoute>
               <HistoryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/recognize"
+          element={
+            <ProtectedRoute>
+              <RecognizePage />
             </ProtectedRoute>
           }
         />

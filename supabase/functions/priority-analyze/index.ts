@@ -9,6 +9,7 @@ const corsHeaders = {
 }
 
 interface PriorityInput {
+  focus: string
   whatWentWell: string
   yourPart: string
   impact: string
@@ -17,24 +18,31 @@ interface PriorityInput {
 interface FiresExtraction {
   element: 'feelings' | 'influence' | 'resilience' | 'ethics' | 'strengths'
   evidence: string
+  strength: number
 }
 
 interface PriorityOutput {
   priorityLine: string
   firesElements: FiresExtraction[]
   reflectionInsight: string
+  yourPattern: string
+  patternQuotes: string[]
+  validationSignal: 'emerging' | 'developing' | 'grounded'
 }
 
 function buildPrompt(input: PriorityInput): string {
   return `You are helping someone see the value in what they just shared. Your job is to MIRROR their experience back to them in a way that feels true and meaningful.
 
-THE PRIORITY TOOL CONTEXT:
-Priority is about noticing what matters and confirming your role in it. Users answer three questions:
-1. What went well? (the situation/event)
-2. What was your part? (their contribution/agency)
-3. What impact did it have? (the meaning/effect)
+THE PRIORITY BUILDER CONTEXT:
+Priority Builder is a daily 2-minute practice that builds evidence of how someone shows up. Users answer four questions:
+1. What were you working on that mattered most today? (the focus)
+2. What went well? (the situation)
+3. What was your part? (their contribution/agency)
+4. What impact did it have? (the meaning/effect)
 
-FIRES FRAMEWORK:
+Over time, these daily entries reveal patterns — the natural ways people create positive outcomes.
+
+FIRES FRAMEWORK (extract these from their responses):
 - Feelings: Emotional awareness, managing emotions, staying grounded
 - Influence: Taking action, making an impact, leading or contributing
 - Resilience: Overcoming challenges, persistence, adaptability
@@ -42,6 +50,9 @@ FIRES FRAMEWORK:
 - Strengths: Using talents, skills, or natural abilities
 
 THEIR RESPONSES:
+
+What they were working on that mattered most:
+"${input.focus}"
 
 What went well:
 "${input.whatWentWell}"
@@ -57,24 +68,34 @@ The impact it had:
 Analyze their responses and provide output in this exact JSON format:
 
 {
-  "priorityLine": "A 1-sentence integrity statement that captures the essence of what they did and why it mattered. Use their own words where possible. Start with 'I' or 'Today I'. Example: 'Today I showed up fully, even when it was hard, and it made a real difference.'",
+  "priorityLine": "A 1-sentence proof statement that captures the essence of what they did and why it mattered. Use their own words where possible. Start with 'I'. Example: 'I showed up fully for what mattered, even when it was hard, and it made a real difference.'",
+
+  "yourPattern": "A short phrase (3-7 words) naming what they naturally did well. Example: 'Staying calm under pressure' or 'Turning friction into progress' or 'Showing up before you felt ready'",
+
+  "patternQuotes": ["An exact short quote from their response that shows this pattern", "Another exact quote if relevant"],
 
   "firesElements": [
     {
       "element": "one of: feelings, influence, resilience, ethics, strengths",
-      "evidence": "A brief phrase explaining how this element showed up, using their words"
+      "evidence": "A brief phrase explaining how this element showed up, using their words",
+      "strength": 1-5 rating of how strongly this element appeared
     }
   ],
 
-  "reflectionInsight": "2-3 sentences that help them see a pattern or deeper meaning. Quote their actual words. Help them notice something they might not have seen about themselves. Don't give advice - just reflect what you see."
+  "reflectionInsight": "2-3 sentences that help them see the deeper meaning. Quote their actual words. Help them notice something they might not have seen about themselves. Don't give advice.",
+
+  "validationSignal": "emerging | developing | grounded — based on how specific and clear their responses are. 'grounded' = rich detail with clear agency and impact. 'developing' = good content but could be more specific. 'emerging' = general or vague."
 }
 
 CRITICAL RULES:
 - The priorityLine should feel like THEIR voice, not generic coaching speak
+- yourPattern should be a memorable phrase they could repeat to themselves
+- patternQuotes must be EXACT phrases from their responses (short, 3-10 words each)
 - Only include 2-4 FIRES elements that are clearly present (don't force all 5)
-- Quote their actual words in the reflectionInsight
-- Be warm but not sappy - authentic, not performative
+- In reflectionInsight, quote their actual words with quotation marks
+- Be warm but not sappy — authentic, not performative
 - Help them SEE what they did, don't tell them what to do
+- Ground everything in their specific focus area
 
 Respond ONLY with the JSON object, no additional text.`
 }
@@ -89,7 +110,7 @@ async function callClaudeAPI(prompt: string, apiKey: string): Promise<PriorityOu
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
+      max_tokens: 1500,
       messages: [
         {
           role: 'user',
@@ -140,6 +161,9 @@ serve(async (req) => {
     const input: PriorityInput = await req.json()
 
     // Validate required fields
+    if (!input.focus || input.focus.trim().length === 0) {
+      throw new Error('Missing required field: focus')
+    }
     if (!input.whatWentWell || input.whatWentWell.trim().length === 0) {
       throw new Error('Missing required field: whatWentWell')
     }
