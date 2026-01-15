@@ -209,10 +209,5 @@ export function PredictionDetailPage() {
 }
 
 function calculateScore(prediction: Prediction): number {
-  const scores = prediction.scores
-  if (!scores) return 0
-  const elements = Object.values(scores)
-  if (elements.length === 0) return 0
-  const totalStrength = elements.reduce((sum, score) => sum + (score?.strength || 0), 0)
-  return Math.round((totalStrength / elements.length) * 20)
+  return (prediction as any).current_predictability_score || 0
 }

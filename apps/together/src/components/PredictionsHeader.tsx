@@ -7,15 +7,7 @@ interface PredictionsHeaderProps {
 }
 
 function calculatePredictabilityScore(prediction: Prediction): number {
-  // Calculate score from FIRES scores - average strength across all elements
-  const scores = prediction.scores
-  if (!scores) return 0
-  
-  const elements = Object.values(scores)
-  if (elements.length === 0) return 0
-  
-  const totalStrength = elements.reduce((sum, score) => sum + (score?.strength || 0), 0)
-  return Math.round((totalStrength / elements.length) * 20) // Scale to 0-100
+  return (prediction as any).current_predictability_score || 0
 }
 
 export function PredictionsHeader({ predictions, maxDisplay = 3 }: PredictionsHeaderProps) {
