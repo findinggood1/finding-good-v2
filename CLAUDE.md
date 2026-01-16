@@ -65,3 +65,23 @@ All apps share one Supabase instance. Key tables:
 ## Source of Truth
 
 Read `docs/Finding_Good_Source_of_Truth_v3.md` for full methodology.
+
+## Development Rules
+
+Read `DEVELOPMENT.md` for git workflow, commit conventions, and session guidelines.
+
+## Starting a Claude Session
+
+1. Read this file (CLAUDE.md)
+2. Run `git status` to see current state
+3. Run `git log --oneline -5` to see recent work
+4. Ask Brian what he wants to work on
+5. Follow DEVELOPMENT.md for workflow
+
+## Session Handoff
+
+If context is running low or ending a session:
+1. Commit all working code
+2. Update CURRENT_WORK.md with status (create if needed)
+3. Push to GitHub
+4. Tell Brian what's done and what's next
