@@ -4,8 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev:predict": "pnpm --filter @finding-good/predict dev",
+    "dev": "pnpm -r --parallel dev",
+    "dev:dashboard": "pnpm --filter @finding-good/dashboard dev",
     "dev:priority": "pnpm --filter @finding-good/priority dev",
+    "dev:prove": "pnpm --filter @finding-good/prove dev",
+    "dev:predict": "pnpm --filter @finding-good/predict dev",
     "dev:together": "pnpm --filter @finding-good/together dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
