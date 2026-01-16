@@ -1,5 +1,7 @@
 # CLAUDE.md - Finding Good V2 Monorepo
 
+**⚠️ FIRST: Read `CLAUDE_RULES.md` for session rules and learned patterns.**
+
 This file helps Claude understand the project structure and current state.
 
 ## Project Overview
