@@ -1,6 +1,7 @@
 export { HomePage } from './HomePage'
 export { PredictionDetailPage } from './PredictionDetailPage'
 export { CampfirePage } from './CampfirePage'
+export { ExchangePage } from './ExchangePage'
 export { ConnectionsPage } from './ConnectionsPage'
 export { ConnectionDetailPage } from './ConnectionDetailPage'
 export { MapsPage } from './MapsPage'

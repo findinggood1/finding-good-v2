@@ -4,6 +4,7 @@ import {
   HomePage,
   PredictionDetailPage,
   CampfirePage,
+  ExchangePage,
   ConnectionsPage,
   ConnectionDetailPage,
   MapsPage,
@@ -61,10 +62,20 @@ function App() {
           }
         />
         <Route
+          path="/exchange"
+          element={
+            <ProtectedRoute>
+              <AppLayout activeNav="exchange">
+                <ExchangePage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/connections"
           element={
             <ProtectedRoute>
-              <AppLayout activeNav="connections">
+              <AppLayout activeNav="exchange">
                 <ConnectionsPage />
               </AppLayout>
             </ProtectedRoute>
@@ -74,7 +85,7 @@ function App() {
           path="/connection/:id"
           element={
             <ProtectedRoute>
-              <AppLayout activeNav="connections">
+              <AppLayout activeNav="exchange">
                 <ConnectionDetailPage />
               </AppLayout>
             </ProtectedRoute>
