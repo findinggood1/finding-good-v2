@@ -117,7 +117,6 @@ export function useNoticingInOthers() {
           question,
         }
 
-        console.log('[useNoticingInOthers] data:', noticingData)
         setData(noticingData)
         setError(null)
       } catch (err) {

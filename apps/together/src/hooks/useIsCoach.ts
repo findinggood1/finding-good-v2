@@ -24,12 +24,7 @@ export function useIsCoach() {
           .eq('email', user.email)
           .maybeSingle()
 
-        if (error) {
-          console.warn('Coach check error:', error.message)
-          setIsCoach(false)
-        } else {
-          setIsCoach(!!data)
-        }
+        setIsCoach(!error && !!data)
       } catch (err) {
         console.error('Error checking coach status:', err)
         setIsCoach(false)

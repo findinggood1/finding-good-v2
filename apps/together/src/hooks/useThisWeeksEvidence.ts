@@ -118,7 +118,6 @@ export function useThisWeeksEvidence() {
         items.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
         const finalEvidence = items.slice(0, 10)
 
-        console.log('[useThisWeeksEvidence] evidence items:', finalEvidence.length, finalEvidence)
         setEvidence(finalEvidence)
         setError(null)
       } catch (err) {

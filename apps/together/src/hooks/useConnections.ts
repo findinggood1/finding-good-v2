@@ -31,18 +31,15 @@ export function useConnections() {
         const userEmail = user.email
 
         // Fetch share_visibility records where user is involved
-        const { data: visibilityA, error: errA } = await supabase
+        const { data: visibilityA } = await supabase
           .from('share_visibility')
           .select('*')
           .eq('user_a_email', userEmail)
 
-        const { data: visibilityB, error: errB } = await supabase
+        const { data: visibilityB } = await supabase
           .from('share_visibility')
           .select('*')
           .eq('user_b_email', userEmail)
-
-        if (errA) console.warn('share_visibility A:', errA.message)
-        if (errB) console.warn('share_visibility B:', errB.message)
 
         const connectionMap = new Map<string, Connection>()
 

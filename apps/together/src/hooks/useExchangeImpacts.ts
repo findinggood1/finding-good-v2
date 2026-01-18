@@ -41,7 +41,6 @@ export function useExchangeImpacts() {
 
         if (fetchError) throw fetchError
 
-        console.log('[useExchangeImpacts] impacts:', data?.length ?? 0, data)
         setImpacts(data ?? [])
         setError(null)
       } catch (err) {

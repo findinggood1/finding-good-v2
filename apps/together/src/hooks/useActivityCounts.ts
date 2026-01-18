@@ -94,7 +94,6 @@ export function useActivityCounts(scope: 'week' | 'all' = 'week') {
           pending: pendingRes.count ?? 0,
         }
 
-        console.log('[useActivityCounts] scope:', scope, 'counts:', newCounts)
         setCounts(newCounts)
         setError(null)
       } catch (err) {

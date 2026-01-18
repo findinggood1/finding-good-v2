@@ -54,17 +54,13 @@ export function useCampfire() {
         }
 
         // Fetch inspiration_shares from connected users
-        const { data: shares, error: sharesError } = await supabase
+        const { data: shares } = await supabase
           .from('inspiration_shares')
           .select('*')
           .in('client_email', Array.from(connectedEmails))
           .is('hidden_at', null)
           .order('created_at', { ascending: false })
           .limit(50)
-
-        if (sharesError) {
-          console.warn('inspiration_shares fetch:', sharesError.message)
-        }
 
         const feedItems: FeedItem[] = []
         if (shares) {

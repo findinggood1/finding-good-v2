@@ -127,7 +127,6 @@ export function useYoursVsOthers() {
           others: othersCount[element],
         }))
 
-        console.log('[useYoursVsOthers] comparison:', comparisonData)
         setComparison(comparisonData)
         setError(null)
       } catch (err) {

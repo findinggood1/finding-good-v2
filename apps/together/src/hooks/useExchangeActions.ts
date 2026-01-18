@@ -36,13 +36,11 @@ export function useExchangeActions() {
       if (insertError) {
         // Unique constraint violation means already recognized - that's ok
         if (insertError.code === '23505') {
-          console.log('[useExchangeActions] Already recognized')
           return true
         }
         throw insertError
       }
 
-      console.log('[useExchangeActions] Recognized:', entryType, entryId)
       return true
     } catch (err) {
       console.error('Error recognizing entry:', err)
@@ -86,7 +84,6 @@ export function useExchangeActions() {
 
       if (insertError) throw insertError
 
-      console.log('[useExchangeActions] Impact recorded:', impactLevel, contentId)
       return true
     } catch (err) {
       console.error('Error recording impact:', err)

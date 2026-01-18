@@ -65,7 +65,7 @@ export function useFeed(options: UseFeedOptions = {}) {
         }
 
         // Fetch inspiration_shares from circle members
-        const { data: shares, error: sharesError } = await supabase
+        const { data: shares } = await supabase
           .from('inspiration_shares')
           .select('id, client_email, content_type, share_text, fires_extracted, prediction_id, created_at')
           .in('client_email', emailsToFetch)
@@ -73,10 +73,9 @@ export function useFeed(options: UseFeedOptions = {}) {
           .order('created_at', { ascending: false })
           .limit(50)
 
-        if (sharesError) console.warn('Shares fetch:', sharesError.message)
 
         // Also fetch validations with share_to_feed = true
-        const { data: proofs, error: proofsError } = await supabase
+        const { data: proofs } = await supabase
           .from('validations')
           .select('id, proof_line, fires_extracted, prediction_id, created_at, client_email')
           .in('client_email', emailsToFetch)
@@ -84,18 +83,14 @@ export function useFeed(options: UseFeedOptions = {}) {
           .order('created_at', { ascending: false })
           .limit(50)
 
-        if (proofsError) console.warn('Proofs fetch:', proofsError.message)
-
         // Fetch priorities shared to feed
-        const { data: priorities, error: prioritiesError } = await supabase
+        const { data: priorities } = await supabase
           .from('priorities')
           .select('id, integrity_line, fires_extracted, prediction_id, created_at, client_email, target_name')
           .in('client_email', emailsToFetch)
           .eq('share_to_feed', true)
           .order('created_at', { ascending: false })
           .limit(50)
-
-        if (prioritiesError) console.warn('Priorities fetch:', prioritiesError.message)
 
         // Transform into FeedItems
         const feedItems: FeedItem[] = []
@@ -154,7 +149,6 @@ export function useFeed(options: UseFeedOptions = {}) {
         )
 
         const finalItems = feedItems.slice(0, 50)
-        console.log('[useFeed] filterByCircle:', filterByCircle, 'circle:', circleArray.length, 'items:', finalItems.length)
         setItems(finalItems)
         setError(null)
       } catch (err) {

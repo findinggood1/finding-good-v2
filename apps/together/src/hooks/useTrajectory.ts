@@ -74,7 +74,6 @@ export function useTrajectory() {
           }
         })
 
-        console.log('[useTrajectory] points:', points.length, points)
         setTrajectory(points)
         setError(null)
       } catch (err) {

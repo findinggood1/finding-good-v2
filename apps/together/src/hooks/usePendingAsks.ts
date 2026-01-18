@@ -31,14 +31,12 @@ export function usePendingAsks() {
         const userEmail = user.email!
 
         // Fetch pending proof_requests where user is the recipient
-        const { data: proofRequests, error: prError } = await supabase
+        const { data: proofRequests } = await supabase
           .from('proof_requests')
           .select('id, requester_email, requester_name, goal_challenge, created_at, share_id')
           .eq('recipient_email', userEmail)
           .eq('status', 'pending')
           .order('created_at', { ascending: false })
-
-        if (prError) console.warn('proof_requests fetch:', prError.message)
 
         // Transform to PendingAsk format
         const pendingAsks: PendingAsk[] = []
@@ -58,7 +56,6 @@ export function usePendingAsks() {
         // Sort by date
         pendingAsks.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
-        console.log('[usePendingAsks] asks:', pendingAsks.length, pendingAsks)
         setAsks(pendingAsks)
         setError(null)
       } catch (err) {
