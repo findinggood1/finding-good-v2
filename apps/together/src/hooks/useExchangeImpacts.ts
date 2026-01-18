@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getSupabase as _getSupabase, useAuth } from '@finding-good/shared'
-// TODO: _getSupabase will be used in IMPLEMENT phase
+import { getSupabase, useAuth } from '@finding-good/shared'
 
 export interface ExchangeImpact {
   id: string
@@ -29,9 +28,21 @@ export function useExchangeImpacts() {
     const fetchImpacts = async () => {
       try {
         setLoading(true)
-        // TODO: Implement query for exchange_impacts where recipient_email = user
-        setImpacts([])
-        console.log('[useExchangeImpacts] impacts: [] (stub - P1)')
+        const supabase = getSupabase()
+        const userEmail = user.email!
+
+        // Fetch exchange impacts where user is the recipient (impacts others reported on your content)
+        const { data, error: fetchError } = await supabase
+          .from('exchange_impacts')
+          .select('*')
+          .eq('recipient_email', userEmail)
+          .order('created_at', { ascending: false })
+          .limit(50)
+
+        if (fetchError) throw fetchError
+
+        console.log('[useExchangeImpacts] impacts:', data?.length ?? 0, data)
+        setImpacts(data ?? [])
         setError(null)
       } catch (err) {
         console.error('Error fetching exchange impacts:', err)

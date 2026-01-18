@@ -18,5 +18,8 @@ export { useThisWeeksEvidence, type EvidenceItem } from './useThisWeeksEvidence'
 export { useNoticingInOthers, type NoticingData } from './useNoticingInOthers'
 export { useTrajectory, type TrajectoryPoint } from './useTrajectory'
 export { useYoursVsOthers, type FiresComparison } from './useYoursVsOthers'
-export { useExchangeImpacts } from './useExchangeImpacts'
-export { usePendingAsks } from './usePendingAsks'
+export { useExchangeImpacts, type ExchangeImpact } from './useExchangeImpacts'
+export { usePendingAsks, type PendingAsk } from './usePendingAsks'
+
+// P1 Hooks - Exchange actions
+export { useExchangeActions, type ImpactLevel } from './useExchangeActions'

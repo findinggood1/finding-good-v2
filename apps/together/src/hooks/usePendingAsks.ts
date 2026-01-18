@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getSupabase as _getSupabase, useAuth } from '@finding-good/shared'
-// TODO: _getSupabase will be used in IMPLEMENT phase
+import { getSupabase, useAuth } from '@finding-good/shared'
 
 export interface PendingAsk {
   id: string
@@ -9,6 +8,7 @@ export interface PendingAsk {
   requester_name: string | null
   question: string
   created_at: string
+  share_id?: string
 }
 
 export function usePendingAsks() {
@@ -27,11 +27,39 @@ export function usePendingAsks() {
     const fetchAsks = async () => {
       try {
         setLoading(true)
-        // TODO: Implement query for:
-        // proof_requests WHERE recipient_email = user AND status = 'pending'
-        // priority_asks WHERE recipient_email = user AND not completed
-        setAsks([])
-        console.log('[usePendingAsks] asks: [] (stub - P1)')
+        const supabase = getSupabase()
+        const userEmail = user.email!
+
+        // Fetch pending proof_requests where user is the recipient
+        const { data: proofRequests, error: prError } = await supabase
+          .from('proof_requests')
+          .select('id, requester_email, requester_name, goal_challenge, created_at, share_id')
+          .eq('recipient_email', userEmail)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false })
+
+        if (prError) console.warn('proof_requests fetch:', prError.message)
+
+        // Transform to PendingAsk format
+        const pendingAsks: PendingAsk[] = []
+
+        proofRequests?.forEach(pr => {
+          pendingAsks.push({
+            id: pr.id,
+            type: 'proof_request',
+            requester_email: pr.requester_email,
+            requester_name: pr.requester_name,
+            question: pr.goal_challenge || 'What would you tell them?',
+            created_at: pr.created_at,
+            share_id: pr.share_id,
+          })
+        })
+
+        // Sort by date
+        pendingAsks.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+        console.log('[usePendingAsks] asks:', pendingAsks.length, pendingAsks)
+        setAsks(pendingAsks)
         setError(null)
       } catch (err) {
         console.error('Error fetching pending asks:', err)
