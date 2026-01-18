@@ -1,25 +1,27 @@
 import { LoadingSpinner } from '@finding-good/shared'
-import { PredictionsHeader, FeedCard, ZoneCards, StorySections, Superpowers } from '../components'
+import { PredictionsHeader, FeedCard } from '../components'
+import { PredictabilityCard, FiresGrid, ActivityCounts, EvidenceList, NoticingCard } from '../components/home'
 import { usePredictions } from '../hooks/usePredictions'
 import { useFeed } from '../hooks/useFeed'
 import { useActivityCounts } from '../hooks/useActivityCounts'
 import { useThisWeeksEvidence } from '../hooks/useThisWeeksEvidence'
-import { useTrajectory } from '../hooks/useTrajectory'
-import { useYoursVsOthers } from '../hooks/useYoursVsOthers'
 import { useNoticingInOthers } from '../hooks/useNoticingInOthers'
+import { useZoneData } from '../hooks/useZoneData'
 
 export function HomePage() {
   const { predictions, loading: predictionsLoading } = usePredictions()
   const { items: feedItems, loading: feedLoading } = useFeed()
+  const { counts, loading: countsLoading } = useActivityCounts('week')
+  const { evidence, loading: evidenceLoading } = useThisWeeksEvidence()
+  const { firesFrequency, recentCount, question, loading: noticingLoading } = useNoticingInOthers()
+  const { zoneBreakdown, growthOpportunity, loading: zoneLoading } = useZoneData()
 
-  // P0 hooks for verification (console.log output)
-  useActivityCounts('week')
-  useThisWeeksEvidence()
-  useTrajectory()
-  useYoursVsOthers()
-  useNoticingInOthers()
+  // Get predictability data from first active prediction
+  const activePrediction = predictions.find(p => p.status === 'active')
+  // Type assertion - current_predictability_score exists in DB but not in shared types
+  const predictabilityScore = (activePrediction as { current_predictability_score?: number } | undefined)?.current_predictability_score ?? null
 
-  const loading = predictionsLoading || feedLoading
+  const loading = predictionsLoading || feedLoading || countsLoading || evidenceLoading || noticingLoading || zoneLoading
 
   if (loading) {
     return (
@@ -30,21 +32,44 @@ export function HomePage() {
   }
 
   return (
-    <div>
+    <div className="space-y-4 pb-20">
       {/* Predictions Header */}
       <PredictionsHeader predictions={predictions} />
 
-      {/* Zone Cards */}
-      <ZoneCards />
+      {/* Main content grid */}
+      <div className="px-4 space-y-4">
+        {/* Predictability Score */}
+        <PredictabilityCard
+          score={predictabilityScore}
+          trend={null}
+          clarity={null}
+          confidence={null}
+          connection={null}
+        />
 
-      {/* Story Sections */}
-      <StorySections />
+        {/* FIRES Grid */}
+        <FiresGrid
+          zoneBreakdown={zoneBreakdown}
+          growthEdge={growthOpportunity?.element ?? null}
+        />
 
-      {/* Superpowers */}
-      <Superpowers />
+        {/* Activity Counts */}
+        <ActivityCounts counts={counts} scope="week" />
+
+        {/* This Week's Evidence */}
+        <EvidenceList items={evidence} />
+
+        {/* What You're Noticing */}
+        <NoticingCard
+          firesFrequency={firesFrequency}
+          recentCount={recentCount}
+          question={question}
+        />
+      </div>
 
       {/* Feed */}
-      <div className="p-4 space-y-3">
+      <div className="px-4 space-y-3">
+        <div className="text-sm font-medium text-gray-600">RECENT ACTIVITY</div>
         {feedItems.length === 0 ? (
           <EmptyFeedState hasPredictions={predictions.length > 0} />
         ) : (
