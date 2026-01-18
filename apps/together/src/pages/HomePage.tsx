@@ -2,10 +2,22 @@ import { LoadingSpinner } from '@finding-good/shared'
 import { PredictionsHeader, FeedCard, ZoneCards, StorySections, Superpowers } from '../components'
 import { usePredictions } from '../hooks/usePredictions'
 import { useFeed } from '../hooks/useFeed'
+import { useActivityCounts } from '../hooks/useActivityCounts'
+import { useThisWeeksEvidence } from '../hooks/useThisWeeksEvidence'
+import { useTrajectory } from '../hooks/useTrajectory'
+import { useYoursVsOthers } from '../hooks/useYoursVsOthers'
+import { useNoticingInOthers } from '../hooks/useNoticingInOthers'
 
 export function HomePage() {
   const { predictions, loading: predictionsLoading } = usePredictions()
   const { items: feedItems, loading: feedLoading } = useFeed()
+
+  // P0 hooks for verification (console.log output)
+  useActivityCounts('week')
+  useThisWeeksEvidence()
+  useTrajectory()
+  useYoursVsOthers()
+  useNoticingInOthers()
 
   const loading = predictionsLoading || feedLoading
 

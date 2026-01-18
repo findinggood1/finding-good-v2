@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { FiresElement } from '@finding-good/shared'
 import { FIRES_COLORS, FIRES_LABELS } from '@finding-good/shared'
 
-export type FeedItemType = 'priority' | 'proof' | 'share'
+export type FeedItemType = 'priority' | 'proof' | 'share' | 'prediction'
 
 export interface FeedItem {
   id: string
@@ -14,6 +14,7 @@ export interface FeedItem {
   client_email: string
   client_name?: string
   isOwn: boolean
+  targetName?: string  // For priorities about others
 }
 
 interface FeedCardProps {
@@ -42,6 +43,7 @@ function getTypeLabel(type: FeedItemType): string {
     case 'priority': return 'Priority'
     case 'proof': return 'Proof'
     case 'share': return 'Share'
+    case 'prediction': return 'Prediction'
   }
 }
 
@@ -69,11 +71,20 @@ function ShareIcon() {
   )
 }
 
+function PredictionIcon() {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+    </svg>
+  )
+}
+
 function getTypeIcon(type: FeedItemType) {
   switch (type) {
     case 'priority': return <PriorityIcon />
     case 'proof': return <ProofIcon />
     case 'share': return <ShareIcon />
+    case 'prediction': return <PredictionIcon />
   }
 }
 

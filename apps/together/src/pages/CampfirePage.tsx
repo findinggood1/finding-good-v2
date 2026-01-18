@@ -1,9 +1,12 @@
 import { LoadingSpinner } from '@finding-good/shared'
 import { FeedCard } from '../components'
-import { useCampfire } from '../hooks'
+import { useCampfire, usePendingAsks } from '../hooks'
 
 export function CampfirePage() {
   const { items, loading } = useCampfire()
+
+  // P1 hook for verification (console.log output)
+  usePendingAsks()
 
   if (loading) {
     return (

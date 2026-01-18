@@ -31,6 +31,7 @@ export function usePendingAsks() {
         // proof_requests WHERE recipient_email = user AND status = 'pending'
         // priority_asks WHERE recipient_email = user AND not completed
         setAsks([])
+        console.log('[usePendingAsks] asks: [] (stub - P1)')
         setError(null)
       } catch (err) {
         console.error('Error fetching pending asks:', err)

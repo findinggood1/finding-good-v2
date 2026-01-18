@@ -31,6 +31,7 @@ export function useExchangeImpacts() {
         setLoading(true)
         // TODO: Implement query for exchange_impacts where recipient_email = user
         setImpacts([])
+        console.log('[useExchangeImpacts] impacts: [] (stub - P1)')
         setError(null)
       } catch (err) {
         console.error('Error fetching exchange impacts:', err)

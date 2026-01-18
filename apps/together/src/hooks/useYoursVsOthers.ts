@@ -1,13 +1,28 @@
 import { useState, useEffect } from 'react'
-import { getSupabase as _getSupabase, useAuth } from '@finding-good/shared'
-// TODO: _getSupabase will be used in IMPLEMENT phase
+import { getSupabase, useAuth } from '@finding-good/shared'
 import type { FiresElement } from '@finding-good/shared'
 
 export interface FiresComparison {
   element: FiresElement
-  yours: number  // Count in your entries
-  others: number // Count others saw in you
+  yours: number  // Count in "About you" (self-entries + received)
+  others: number // Count in "You noticed" (what you noticed in others)
 }
+
+// Map of FIRES letter codes to full element names
+const FIRES_MAP: Record<string, FiresElement> = {
+  F: 'feelings',
+  I: 'influence',
+  R: 'resilience',
+  E: 'ethics',
+  S: 'strengths',
+  feelings: 'feelings',
+  influence: 'influence',
+  resilience: 'resilience',
+  ethics: 'ethics',
+  strengths: 'strengths',
+}
+
+const FIRES_ELEMENTS: FiresElement[] = ['feelings', 'influence', 'resilience', 'ethics', 'strengths']
 
 export function useYoursVsOthers() {
   const { user } = useAuth()
@@ -25,10 +40,95 @@ export function useYoursVsOthers() {
     const fetchComparison = async () => {
       try {
         setLoading(true)
-        // TODO: Implement queries for:
-        // "About you" = priorities(type='self') + priorities(recipient_email=user) → fires_extracted
-        // "You noticed" = priorities(type='other', client_email=user) → fires_extracted
-        setComparison([])
+        const supabase = getSupabase()
+        const userEmail = user.email
+
+        // "About you" - priorities about self
+        const { data: selfPriorities } = await supabase
+          .from('priorities')
+          .select('fires_extracted')
+          .eq('client_email', userEmail)
+          .eq('type', 'self')
+
+        // "About you" - recognitions received from others
+        const { data: receivedPriorities } = await supabase
+          .from('priorities')
+          .select('fires_extracted')
+          .eq('recipient_email', userEmail)
+          .not('client_email', 'eq', userEmail)
+
+        // "You noticed" - what user noticed in others
+        const { data: noticedPriorities } = await supabase
+          .from('priorities')
+          .select('fires_extracted')
+          .eq('client_email', userEmail)
+          .eq('type', 'other')
+
+        // Count FIRES elements for "About you" (yours)
+        const yoursCount: Record<FiresElement, number> = {
+          feelings: 0,
+          influence: 0,
+          resilience: 0,
+          ethics: 0,
+          strengths: 0,
+        }
+
+        // Count from self priorities
+        selfPriorities?.forEach(p => {
+          const fires = p.fires_extracted as string[] | null
+          if (fires && Array.isArray(fires)) {
+            fires.forEach(f => {
+              const element = FIRES_MAP[f] || FIRES_MAP[f.toLowerCase()]
+              if (element) {
+                yoursCount[element]++
+              }
+            })
+          }
+        })
+
+        // Count from received priorities
+        receivedPriorities?.forEach(p => {
+          const fires = p.fires_extracted as string[] | null
+          if (fires && Array.isArray(fires)) {
+            fires.forEach(f => {
+              const element = FIRES_MAP[f] || FIRES_MAP[f.toLowerCase()]
+              if (element) {
+                yoursCount[element]++
+              }
+            })
+          }
+        })
+
+        // Count FIRES elements for "You noticed" (others)
+        const othersCount: Record<FiresElement, number> = {
+          feelings: 0,
+          influence: 0,
+          resilience: 0,
+          ethics: 0,
+          strengths: 0,
+        }
+
+        noticedPriorities?.forEach(p => {
+          const fires = p.fires_extracted as string[] | null
+          if (fires && Array.isArray(fires)) {
+            fires.forEach(f => {
+              const element = FIRES_MAP[f] || FIRES_MAP[f.toLowerCase()]
+              if (element) {
+                othersCount[element]++
+              }
+            })
+          }
+        })
+
+        // Build comparison array
+        const comparisonData: FiresComparison[] = FIRES_ELEMENTS.map(element => ({
+          element,
+          yours: yoursCount[element],
+          others: othersCount[element],
+        }))
+
+        console.log('[useYoursVsOthers] comparison:', comparisonData)
+        setComparison(comparisonData)
         setError(null)
       } catch (err) {
         console.error('Error fetching FIRES comparison:', err)

@@ -11,3 +11,12 @@ export { useCoachingNotes, type CoachingNote } from './useCoachingNotes'
 export { useZoneData, type ZoneData } from './useZoneData'
 export { useMapData, type MapData } from './useMapData'
 export { useStoryData, type StoryData } from './useStoryData'
+
+// P0 Hooks - Together/Campfire rebuild (Jan 2026)
+export { useActivityCounts, type ActivityCounts } from './useActivityCounts'
+export { useThisWeeksEvidence, type EvidenceItem } from './useThisWeeksEvidence'
+export { useNoticingInOthers, type NoticingData } from './useNoticingInOthers'
+export { useTrajectory, type TrajectoryPoint } from './useTrajectory'
+export { useYoursVsOthers, type FiresComparison } from './useYoursVsOthers'
+export { useExchangeImpacts } from './useExchangeImpacts'
+export { usePendingAsks } from './usePendingAsks'
