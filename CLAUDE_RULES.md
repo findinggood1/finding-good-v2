@@ -14,8 +14,30 @@ Every Claude session should begin with:
 1. Read this file (CLAUDE_RULES.md)
 2. Read CLAUDE.md for project context
 3. Run `git status` and `git log --oneline -5`
-4. Ask what Brian wants to work on
-5. Understand the goal before writing code
+4. **If this is a BUILD session:** Read BUILD_PROTOCOL.md and the relevant Build Document
+5. Ask what Brian wants to work on
+6. Understand the goal before writing code
+
+---
+
+## Build System (Added Jan 17, 2026)
+
+### Key Files
+- `docs/BUILD_PROTOCOL.md` - How to execute builds (SPEC → SCAFFOLD → IMPLEMENT → VALIDATE → POLISH)
+- `docs/PATTERNS_LIBRARY.md` - Reusable patterns and mistakes to avoid
+- Build Documents come from Brian via `fg-command-center/builds/active/`
+
+### Build Session Rules
+1. **Always follow BUILD_PROTOCOL.md** - Don't skip phases
+2. **Validate each layer before moving to next** - DB ✓ → Edge ✓ → Shared ✓ → UI ✓
+3. **Hard restart between IMPLEMENT and VALIDATE** - Fresh context for testing
+4. **Stop and ask when stuck > 15 minutes** - Don't spin
+5. **Post-mortem after every build** - Learnings go to PATTERNS_LIBRARY.md
+
+### When a Build Document Exists
+- The Build Document is the source of truth for scope
+- Don't expand scope without Brian's approval
+- Track progress in the Build Document's Progress Tracker section
 
 ---
 

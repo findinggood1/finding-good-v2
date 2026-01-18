@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres.mdsgkddrnqhhtncfeqxw:FindingGood2024abc@aws-0-us-west-2.pooler.supabase.com:5432/postgres"
+      ]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "C:\\Users\\bfret\\firesalignment",
+        "C:\\Users\\bfret\\fgimpact",
+        "C:\\Users\\bfret\\OneDrive\\Desktop\\dashboard",
+        "C:\\Users\\bfret\\finding-good-prove-tool",
+        "C:\\Users\\bfret\\finding-good-v2"
+      ]
+    }
+  }
+}
