@@ -176,6 +176,23 @@ export function useSavePrediction(): UseSavePredictionResult {
     try {
       const supabase = getSupabase()
 
+      // 0. Ensure client exists (so they appear in coach dashboard)
+      const { data: existingClient } = await supabase
+        .from('clients')
+        .select('email')
+        .eq('email', userEmail)
+        .maybeSingle()
+
+      if (!existingClient) {
+        const { error: clientError } = await supabase
+          .from('clients')
+          .insert({ email: userEmail, status: 'pending' })
+
+        if (clientError && !clientError.message.includes('duplicate')) {
+          console.error('Failed to create client:', clientError)
+        }
+      }
+
       // 1. Save prediction
       const { data: prediction, error: predictionError } = await supabase
         .from('predictions')
@@ -328,6 +345,22 @@ export function useSavePrediction(): UseSavePredictionResult {
 
       if (snapshotError) {
         console.error('Failed to save snapshot:', snapshotError)
+      }
+
+      // 5b. Update prediction with snapshot reference and calculated scores
+      if (snapshot?.id) {
+        const { error: updateError } = await supabase
+          .from('predictions')
+          .update({
+            latest_snapshot_id: snapshot.id,
+            current_predictability_score: predictabilityScore,
+            connection_count: totalConnectionCount,
+          })
+          .eq('id', predictionId)
+
+        if (updateError) {
+          console.error('Failed to update prediction with snapshot:', updateError)
+        }
       }
 
       // 6. Call AI narrative edge function (non-blocking)
