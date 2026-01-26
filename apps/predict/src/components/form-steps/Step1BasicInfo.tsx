@@ -73,6 +73,23 @@ export function Step1BasicInfo({ data, onChange }: Step1BasicInfoProps) {
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary outline-none transition-colors resize-none"
         />
       </div>
+
+      <div className="border-t border-gray-200 pt-6">
+        <label htmlFor="what_matters_most" className="block text-sm font-medium text-gray-700 mb-2">
+          What do you want more of in your life right now?
+        </label>
+        <textarea
+          id="what_matters_most"
+          value={data.what_matters_most}
+          onChange={(e) => onChange({ what_matters_most: e.target.value })}
+          placeholder="e.g., More time with family, creative freedom, financial peace..."
+          rows={3}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-brand-primary outline-none transition-colors resize-none"
+        />
+        <p className="mt-2 text-sm text-gray-500">
+          This helps surface your Permission — what you're giving yourself permission to want more of.
+        </p>
+      </div>
     </div>
   )
 }

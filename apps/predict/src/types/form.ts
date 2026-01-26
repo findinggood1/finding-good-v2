@@ -62,6 +62,7 @@ export interface PredictionFormData {
   title: string
   type: PredictionType
   description: string
+  what_matters_most: string
 
   // Step 2: Future Story (with confidence ratings)
   future_story: FutureStory
@@ -83,6 +84,7 @@ export const INITIAL_FORM_DATA: PredictionFormData = {
   title: '',
   type: 'goal',
   description: '',
+  what_matters_most: '',
   future_story: {
     fs1_goal: '',
     fs2_feelings: '',

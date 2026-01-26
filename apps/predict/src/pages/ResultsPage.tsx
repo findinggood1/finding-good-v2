@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { FIRES_COLORS, FIRES_LABELS, getSupabase } from '@finding-good/shared'
 import { usePrediction } from '../hooks'
@@ -58,6 +58,42 @@ export function ResultsPage() {
   const [showFullDetails, setShowFullDetails] = useState(false)
   const [regenerating, setRegenerating] = useState(false)
   const [regenerateError, setRegenerateError] = useState<string | null>(null)
+  const [shareToFeed, setShareToFeed] = useState(false)
+  const [savingShare, setSavingShare] = useState(false)
+
+  // Initialize share state from prediction when loaded
+  useEffect(() => {
+    if (prediction?.share_to_feed !== undefined && prediction?.share_to_feed !== null) {
+      setShareToFeed(prediction.share_to_feed)
+    }
+  }, [prediction?.share_to_feed])
+
+  const toggleShareToFeed = useCallback(async () => {
+    if (!prediction?.id) return
+
+    const newValue = !shareToFeed
+    setShareToFeed(newValue)
+    setSavingShare(true)
+
+    try {
+      const supabase = getSupabase()
+      const { error: updateError } = await supabase
+        .from('predictions')
+        .update({ share_to_feed: newValue })
+        .eq('id', prediction.id)
+
+      if (updateError) {
+        // Revert on error
+        setShareToFeed(!newValue)
+        console.error('Failed to update share preference:', updateError)
+      }
+    } catch (err) {
+      setShareToFeed(!newValue)
+      console.error('Failed to update share preference:', err)
+    } finally {
+      setSavingShare(false)
+    }
+  }, [prediction?.id, shareToFeed])
 
   const regenerateInsights = useCallback(async () => {
     if (!snapshot) return
@@ -624,7 +660,62 @@ export function ResultsPage() {
           </p>
         </div>
 
-        {/* SECTION 9: VIEW FULL DETAILS */}
+        {/* SECTION 9: DISCOVER YOUR PRACTICE */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 bg-brand-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg className="w-5 h-5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <p className="font-semibold text-gray-900 mb-1">Discover Your Practice</p>
+              <p className="text-sm text-gray-600 mb-4">
+                Turn this prediction into a daily practice that keeps you focused on what matters most.
+              </p>
+              <a
+                href="https://permission.findinggood.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-primary text-white text-sm font-medium rounded-lg hover:bg-brand-primary/90 transition-colors"
+              >
+                Discover Your Practice
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 10: SHARE TO CAMPFIRE */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+            Share
+          </p>
+          <label className="flex items-start gap-3 cursor-pointer">
+            <div className="relative mt-0.5">
+              <input
+                type="checkbox"
+                checked={shareToFeed}
+                onChange={toggleShareToFeed}
+                disabled={savingShare}
+                className="sr-only peer"
+              />
+              <div className={`w-10 h-6 rounded-full transition-colors ${shareToFeed ? 'bg-brand-primary' : 'bg-gray-200'} ${savingShare ? 'opacity-50' : ''}`}>
+                <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${shareToFeed ? 'translate-x-4' : ''}`} />
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-900">Share this prediction to your Campfire</p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Your connections can see and be inspired by your goal.
+              </p>
+            </div>
+          </label>
+        </div>
+
+        {/* VIEW FULL DETAILS */}
         <button
           onClick={() => setShowFullDetails(!showFullDetails)}
           className="w-full py-3 text-sm font-medium text-gray-500 hover:text-gray-700 flex items-center justify-center gap-2"
@@ -822,7 +913,7 @@ export function ResultsPage() {
           </div>
         )}
 
-        {/* SECTION 10: BACK BUTTON */}
+        {/* BACK BUTTON */}
         <div className="pt-4">
           <Link
             to="/"

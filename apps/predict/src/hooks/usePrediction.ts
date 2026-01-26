@@ -8,6 +8,8 @@ interface Prediction {
   description: string | null
   type: string
   status: string
+  what_matters_most: string | null
+  share_to_feed: boolean | null
   created_at: string
   updated_at: string
 }

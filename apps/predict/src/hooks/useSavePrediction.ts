@@ -202,6 +202,7 @@ export function useSavePrediction(): UseSavePredictionResult {
           description: data.description || null,
           type: data.type,
           status: 'active',
+          what_matters_most: data.what_matters_most || null,
         })
         .select('id')
         .single()
