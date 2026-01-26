@@ -1,41 +1,7 @@
-import { useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useMemo, useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Card, Textarea, Badge, FIRES_LABELS, getSupabase, useAuth } from '@finding-good/shared'
 import type { FiresElement } from '@finding-good/shared'
-
-// Rotating awareness insights for each question
-const AWARENESS_INSIGHTS = {
-  whatWentWell: [
-    "Sometimes what went well is simply feeling happy. Claiming this helps others claim happiness too.",
-    "Small progress counts. Noticing it builds the muscle of noticing.",
-    "Staying calm when you could have reacted IS something going well.",
-    "Doing the right thing even when no one noticed - that is worth capturing.",
-    "Making someone else's job easier counts. Influence is not always visible.",
-    "A good conversation is a win. Connection is progress.",
-    "Not quitting is going well. Persistence is its own success.",
-    "Learning something new - even something small - counts.",
-  ],
-  yourPart: [
-    "Sometimes not doing anything IS doing something.",
-    "Noticing is enough. Awareness is an action.",
-    "Asking for help is a contribution, not a weakness.",
-    "Choosing not to compromise - that is agency.",
-    "Using what you are already good at counts.",
-    "Showing up before you felt ready is a choice worth naming.",
-    "Setting a boundary is doing something important.",
-    "Listening without fixing is a skill you used.",
-  ],
-  impact: [
-    "Impact on YOU counts. How you feel matters.",
-    "Even if no one said anything, something shifted.",
-    "Sometimes the impact is just: you did not quit.",
-    "When you act with integrity, others notice - even if they do not say it.",
-    "Doing something well makes the next time easier. That is impact.",
-    "Your energy affected the room, even if you did not see it.",
-    "Future you benefits from what present you just did.",
-    "Someone else might try this because you did. That is influence.",
-  ],
-}
 
 // FIRES element descriptions for info tooltips
 const FIRES_DESCRIPTIONS: Record<FiresElement, string> = {
@@ -46,37 +12,13 @@ const FIRES_DESCRIPTIONS: Record<FiresElement, string> = {
   strengths: "Using your natural talents and skills. What you bring to situations that others might not.",
 }
 
-// Helper framing chips for each question
-const HELPER_FRAMINGS = {
-  focus: [
-    "A project I am pushing forward",
-    "A relationship I am investing in",
-    "A challenge I am working through",
-    "A skill I am developing",
-    "A commitment I am honoring",
-  ],
-  whatWentWell: [
-    "I showed up when...",
-    "I followed through on...",
-    "I spoke up about...",
-    "I stayed calm during...",
-    "I made progress on...",
-  ],
-  yourPart: [
-    "I chose to...",
-    "I prepared by...",
-    "I asked for help with...",
-    "I said no to...",
-    "I prioritized...",
-  ],
-  impact: [
-    "It meant that...",
-    "Others noticed...",
-    "I felt...",
-    "It opened up...",
-    "It proved that...",
-  ],
-}
+// Default chips when user has no Focus items set
+const DEFAULT_FOCUS_CHIPS = [
+  'A project I pushed forward',
+  'A relationship I invested in',
+  'A challenge I worked through',
+  'A commitment I honored',
+]
 
 interface FiresExtraction {
   element: FiresElement
@@ -92,15 +34,15 @@ interface PriorityResult {
   patternQuotes?: string[]
 }
 
-// Get random insight from array
-function getRandomInsight(insights: string[]): string {
-  return insights[Math.floor(Math.random() * insights.length)]
+interface FocusItem {
+  name: string
+  order?: number
 }
 
 // Info icon component with expandable tooltip
 function InfoIcon({ content, className = '' }: { content: string; className?: string }) {
   const [isOpen, setIsOpen] = useState(false)
-  
+
   return (
     <span className={`relative inline-block ${className}`}>
       <button
@@ -112,8 +54,8 @@ function InfoIcon({ content, className = '' }: { content: string; className?: st
       </button>
       {isOpen && (
         <>
-          <div 
-            className="fixed inset-0 z-10" 
+          <div
+            className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
           <div className="absolute left-0 top-6 z-20 w-64 p-3 bg-white rounded-lg shadow-lg border border-gray-200 text-xs text-gray-600 leading-relaxed">
@@ -127,14 +69,27 @@ function InfoIcon({ content, className = '' }: { content: string; className?: st
 
 export function ConfirmPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { userEmail } = useAuth()
-  const [step, setStep] = useState(1)
 
-  // Form state
-  const [focus, setFocus] = useState('')
-  const [whatWentWell, setWhatWentWell] = useState('')
+  // Parse URL parameters for entry context
+  const urlFocus = searchParams.get('focus')
+  const urlEngagement = searchParams.get('engagement')
+  const urlSource = searchParams.get('source')
+  const urlAnswer = searchParams.get('answer')
+
+  // Determine entry mode
+  const isFromCheckin = urlSource === 'checkin' && urlFocus
+
+  // Form state - initialized from URL params if available
+  const [context, setContext] = useState(urlFocus ? decodeURIComponent(urlFocus) : '')
+  const [whatWentWell, setWhatWentWell] = useState(urlAnswer ? decodeURIComponent(urlAnswer) : '')
   const [yourPart, setYourPart] = useState('')
   const [impact, setImpact] = useState('')
+
+  // Focus chips for standalone mode
+  const [focusChips, setFocusChips] = useState<string[]>(DEFAULT_FOCUS_CHIPS)
+  const [isLoadingChips, setIsLoadingChips] = useState(false)
 
   // Options state
   const [shareToCampfire, setShareToCampfire] = useState(false)
@@ -143,20 +98,61 @@ export function ConfirmPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [result, setResult] = useState<PriorityResult | null>(null)
+  const [showResults, setShowResults] = useState(false)
 
-  // Select random insights once per session (stable during form completion)
-  const insights = useMemo(() => ({
-    whatWentWell: getRandomInsight(AWARENESS_INSIGHTS.whatWentWell),
-    yourPart: getRandomInsight(AWARENESS_INSIGHTS.yourPart),
-    impact: getRandomInsight(AWARENESS_INSIGHTS.impact),
-  }), [])
+  // Fetch user's Focus items from permissions table (for standalone mode)
+  useEffect(() => {
+    async function fetchFocusItems() {
+      if (isFromCheckin || !userEmail) return
 
-  const handleHelperClick = (text: string, setter: (value: string) => void, current: string) => {
-    const prefix = current ? `${current} ` : ''
-    setter(`${prefix}${text}`)
+      setIsLoadingChips(true)
+      try {
+        const supabase = getSupabase()
+        const { data: permission } = await supabase
+          .from('permissions')
+          .select('focus')
+          .eq('client_email', userEmail)
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .single()
+
+        if (permission?.focus && Array.isArray(permission.focus) && permission.focus.length > 0) {
+          // Extract focus item names
+          const names = permission.focus
+            .map((item: FocusItem) => item.name)
+            .filter((name: string) => name && name.trim())
+          if (names.length > 0) {
+            setFocusChips(names)
+          }
+        }
+      } catch (err) {
+        // If no permissions found, keep default chips
+        console.log('No focus items found, using defaults')
+      } finally {
+        setIsLoadingChips(false)
+      }
+    }
+
+    fetchFocusItems()
+  }, [userEmail, isFromCheckin])
+
+  // Check if form is valid (all fields filled)
+  const canSubmit = useMemo(() => {
+    return (
+      context.trim().length > 0 &&
+      whatWentWell.trim().length > 0 &&
+      yourPart.trim().length > 0 &&
+      impact.trim().length > 0
+    )
+  }, [context, whatWentWell, yourPart, impact])
+
+  const handleChipClick = (chipText: string) => {
+    setContext(chipText)
   }
 
   const handleSubmit = async () => {
+    if (!canSubmit) return
+
     setIsSubmitting(true)
     setSubmitError(null)
 
@@ -167,7 +163,7 @@ export function ConfirmPage() {
 
       const { data: { session } } = await supabase.auth.getSession()
 
-      // Call the edge function
+      // Call the edge function for AI analysis
       const response = await fetch(functionUrl, {
         method: 'POST',
         headers: {
@@ -175,7 +171,7 @@ export function ConfirmPage() {
           'Authorization': `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
         },
         body: JSON.stringify({
-          focus,
+          focus: context,
           whatWentWell,
           yourPart,
           impact,
@@ -193,37 +189,30 @@ export function ConfirmPage() {
         throw new Error(aiResult.error || 'Analysis failed')
       }
 
-      // Build FIRES extracted object for database
-      const firesExtracted: Record<string, { present: boolean; evidence: string; strength: number }> = {}
-      for (const fe of aiResult.firesElements || []) {
-        firesExtracted[fe.element] = {
-          present: true,
-          evidence: fe.evidence,
-          strength: fe.strength || 3,
-        }
-      }
+      // Build FIRES extracted array for database
+      const firesExtracted = (aiResult.firesElements || []).map((fe: FiresExtraction) => fe.element)
 
-      // Save to validations table
+      // Save to priorities table
       const { error: saveError } = await supabase
-        .from('validations')
+        .from('priorities')
         .insert({
           client_email: userEmail,
-          mode: 'self',
+          type: 'self',
           responses: {
-            focus,
-            whatWentWell,
-            yourPart,
+            context,
+            what_went_well: whatWentWell,
+            your_part: yourPart,
             impact,
           },
-          proof_line: aiResult.priorityLine,
+          integrity_line: aiResult.priorityLine,
           fires_extracted: firesExtracted,
-          validation_signal: aiResult.validationSignal || 'developing',
           share_to_feed: shareToCampfire,
+          shared_at: shareToCampfire ? new Date().toISOString() : null,
         })
 
       if (saveError) {
-        console.error('Failed to save validation:', saveError)
-        // Do not throw - still show results even if save fails
+        console.error('Failed to save priority:', saveError)
+        // Still show results even if save fails
       }
 
       setResult({
@@ -234,7 +223,7 @@ export function ConfirmPage() {
         patternQuotes: aiResult.patternQuotes,
       })
 
-      setStep(5) // Results step
+      setShowResults(true)
     } catch (err) {
       console.error('Submit error:', err)
       setSubmitError(err instanceof Error ? err.message : 'Something went wrong')
@@ -243,16 +232,8 @@ export function ConfirmPage() {
     }
   }
 
-  const canProceed = () => {
-    if (step === 1) return focus.trim().length > 0
-    if (step === 2) return whatWentWell.trim().length > 0
-    if (step === 3) return yourPart.trim().length > 0
-    if (step === 4) return impact.trim().length > 0
-    return false
-  }
-
   // Results view
-  if (step === 5 && result) {
+  if (showResults && result) {
     return (
       <div className="min-h-screen bg-brand-cream p-4">
         <div className="max-w-md mx-auto">
@@ -262,22 +243,57 @@ export function ConfirmPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Priority Confirmed</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Priority Saved</h1>
             <p className="text-gray-600 mt-1">Here is what you proved today</p>
           </div>
 
-          {/* Priority Line */}
+          {/* Integrity Line */}
           <Card padding="lg" className="mb-6 border-brand-primary border-2">
             <div className="flex items-center gap-2 mb-2">
               <p className="text-xs font-semibold text-brand-primary uppercase tracking-wide">
-                Your Proof Line
+                Your Integrity Line
               </p>
-              <InfoIcon content="A proof line is portable evidence - a one-sentence summary you can recall when confidence wavers. Research shows that articulating your wins helps you repeat them." />
+              <InfoIcon content="An integrity line is portable evidence - a one-sentence summary you can recall when confidence wavers." />
             </div>
             <p className="text-lg font-medium text-gray-900 italic">
               &quot;{result.priorityLine}&quot;
             </p>
           </Card>
+
+          {/* FIRES Elements */}
+          {result.firesElements && result.firesElements.length > 0 && (
+            <Card padding="md" className="mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  FIRES Elements Present
+                </p>
+                <InfoIcon content="FIRES = Feelings, Influence, Resilience, Ethics, Strengths. These are extracted from your natural language." />
+              </div>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {result.firesElements.map(({ element }) => (
+                  <Badge key={element} variant="fires" firesElement={element} size="sm">
+                    {FIRES_LABELS[element]}
+                  </Badge>
+                ))}
+              </div>
+              <div className="space-y-3">
+                {result.firesElements.map(({ element, evidence }) => (
+                  <div key={element} className="flex items-start gap-3">
+                    <div className="flex items-center gap-1">
+                      <Badge variant="fires" firesElement={element} size="sm">
+                        {FIRES_LABELS[element]}
+                      </Badge>
+                      <InfoIcon
+                        content={FIRES_DESCRIPTIONS[element]}
+                        className="ml-0.5"
+                      />
+                    </div>
+                    <span className="text-sm text-gray-600 flex-1">{evidence}</span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
 
           {/* Pattern (if available) */}
           {result.yourPattern && (
@@ -286,10 +302,10 @@ export function ConfirmPage() {
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                   Your Pattern
                 </p>
-                <InfoIcon content="Patterns are the recurring ways you create positive outcomes. Over time, they reveal your natural strengths - how you consistently show up when it matters." />
+                <InfoIcon content="Patterns are recurring ways you create positive outcomes. Over time, they reveal your natural strengths." />
               </div>
               <p className="text-gray-900 font-medium mb-3">{result.yourPattern}</p>
-              
+
               {result.patternQuotes && result.patternQuotes.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-xs text-gray-400">In your words:</p>
@@ -303,34 +319,6 @@ export function ConfirmPage() {
             </Card>
           )}
 
-          {/* FIRES Elements */}
-          {result.firesElements && result.firesElements.length > 0 && (
-            <Card padding="md" className="mb-6">
-              <div className="flex items-center gap-2 mb-3">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Elements Present
-                </p>
-                <InfoIcon content="FIRES = Feelings, Influence, Resilience, Ethics, Strengths. These are five internal navigation systems your brain uses when deciding how to act. We extract them from your natural language - you do not have to think about them." />
-              </div>
-              <div className="space-y-3">
-                {result.firesElements.map(({ element, evidence }) => (
-                  <div key={element} className="flex items-start gap-3">
-                    <div className="flex items-center gap-1">
-                      <Badge variant="fires" firesElement={element} size="sm">
-                        {FIRES_LABELS[element]}
-                      </Badge>
-                      <InfoIcon 
-                        content={FIRES_DESCRIPTIONS[element]} 
-                        className="ml-0.5"
-                      />
-                    </div>
-                    <span className="text-sm text-gray-600 flex-1">{evidence}</span>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
-
           {/* Reflection Insight */}
           {result.reflectionInsight && (
             <Card padding="md" className="mb-6 bg-amber-50 border-amber-200">
@@ -338,18 +326,12 @@ export function ConfirmPage() {
                 <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">
                   What This Shows
                 </p>
-                <InfoIcon content="This insight came from YOUR words - we just reflected it back. Studies show we remember self-generated content better than advice we receive. You created this." />
               </div>
               <p className="text-sm text-gray-700 leading-relaxed">
                 {result.reflectionInsight}
               </p>
             </Card>
           )}
-
-          {/* Light science note */}
-          <p className="text-xs text-gray-400 text-center mb-6 italic">
-            Each entry builds your evidence library. Small proof compounds into real confidence.
-          </p>
 
           {/* Your Responses Summary (collapsed by default) */}
           <details className="mb-6">
@@ -359,8 +341,8 @@ export function ConfirmPage() {
             <Card padding="md" className="mt-2">
               <div className="space-y-3 text-sm">
                 <div>
-                  <span className="font-medium text-gray-700">Focus:</span>
-                  <p className="text-gray-600 mt-1">{focus}</p>
+                  <span className="font-medium text-gray-700">What mattered:</span>
+                  <p className="text-gray-600 mt-1">{context}</p>
                 </div>
                 <div>
                   <span className="font-medium text-gray-700">What went well:</span>
@@ -381,22 +363,27 @@ export function ConfirmPage() {
           {/* Actions */}
           <div className="space-y-3">
             <button
-              onClick={() => navigate('/')}
+              onClick={() => {
+                // Reset form for another entry
+                setContext('')
+                setWhatWentWell('')
+                setYourPart('')
+                setImpact('')
+                setShareToCampfire(false)
+                setResult(null)
+                setShowResults(false)
+                // Clear URL params
+                navigate('/confirm', { replace: true })
+              }}
               className="w-full py-3 px-6 bg-[#0D7C66] hover:bg-[#095c4d] text-white font-semibold rounded-lg transition-colors"
             >
+              Add Another
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="w-full py-3 px-6 bg-white text-[#0D7C66] font-semibold rounded-lg border-2 border-[#0D7C66] hover:bg-[#0D7C66] hover:text-white transition-colors"
+            >
               Done
-            </button>
-            <button
-              onClick={() => navigate('/ask')}
-              className="w-full py-3 px-6 bg-white text-[#0D7C66] font-semibold rounded-lg border-2 border-[#0D7C66] hover:bg-[#0D7C66] hover:text-white transition-colors"
-            >
-              Get Inspired by Someone
-            </button>
-            <button
-              onClick={() => navigate('/history')}
-              className="w-full py-3 px-6 bg-white text-[#0D7C66] font-semibold rounded-lg border-2 border-[#0D7C66] hover:bg-[#0D7C66] hover:text-white transition-colors"
-            >
-              View History
             </button>
           </div>
         </div>
@@ -404,13 +391,14 @@ export function ConfirmPage() {
     )
   }
 
+  // Main single-page form
   return (
     <div className="min-h-screen bg-brand-cream p-4">
       <div className="max-w-md mx-auto">
-        {/* Header with back button and progress */}
+        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() => step > 1 ? setStep(step - 1) : navigate('/')}
+            onClick={() => navigate('/')}
             className="flex items-center gap-1 text-gray-500 hover:text-brand-primary transition-colors"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -418,184 +406,131 @@ export function ConfirmPage() {
             </svg>
             Back
           </button>
-          <div className="flex gap-2">
-            {[1, 2, 3, 4].map((s) => (
-              <div
-                key={s}
-                className={`w-3 h-3 rounded-full transition-colors ${
-                  s <= step ? 'bg-brand-primary' : 'bg-gray-300'
-                }`}
-              />
-            ))}
-          </div>
+          <h1 className="text-lg font-semibold text-gray-900">Priority</h1>
           <div className="w-14" />
         </div>
 
-        {/* Micro-education banner - only on step 1 */}
-        {step === 1 && (
-          <div className="bg-brand-primary/10 rounded-lg p-4 border border-brand-primary/20 mb-4">
-            <p className="text-sm font-medium text-brand-primary mb-1">Daily Priority</p>
-            <p className="text-sm text-gray-700">
-              This 2-minute practice builds your evidence of how you show up. Over time, patterns emerge that reveal your natural strengths.
+        {/* All Questions - Single Page */}
+        <div className="space-y-6">
+          {/* Question 1: Context - Different UI based on entry path */}
+          <Card padding="lg">
+            {isFromCheckin ? (
+              // Entry Path 1: From Daily Check-in (pre-populated)
+              <>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Reflecting on
+                </p>
+                <div className="flex items-center justify-between p-3 bg-brand-primary/5 rounded-lg border border-brand-primary/20 mb-4">
+                  <span className="font-medium text-gray-900">{context}</span>
+                  {urlEngagement && (
+                    <span className="text-sm text-brand-primary font-medium">
+                      {urlEngagement}/5 today
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400">
+                  This was your focus from today's check-in.
+                </p>
+              </>
+            ) : (
+              // Entry Path 2: Standalone (with chips)
+              <>
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                  What mattered most today?
+                </h2>
+                <p className="text-gray-500 text-sm mb-4">
+                  Tap a focus area or type your own.
+                </p>
+
+                {/* Focus chips */}
+                {!isLoadingChips && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {focusChips.map((chip) => (
+                      <button
+                        key={chip}
+                        onClick={() => handleChipClick(chip)}
+                        className={`px-3 py-1.5 text-sm rounded-full transition-colors ${
+                          context === chip
+                            ? 'bg-brand-primary text-white'
+                            : 'bg-gray-100 hover:bg-brand-primary/10 text-gray-700 hover:text-brand-primary'
+                        }`}
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <Textarea
+                  value={context}
+                  onChange={(e) => setContext(e.target.value)}
+                  placeholder="Or type what mattered most..."
+                  rows={2}
+                  showCharCount
+                  maxLength={300}
+                />
+              </>
+            )}
+          </Card>
+
+          {/* Question 2: What went well */}
+          <Card padding="lg">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              What went well?
+            </h2>
+            <p className="text-gray-500 text-sm mb-4">
+              What happened that you want to remember?
             </p>
-          </div>
-        )}
+            <Textarea
+              value={whatWentWell}
+              onChange={(e) => setWhatWentWell(e.target.value)}
+              placeholder="Describe what went well..."
+              rows={3}
+              showCharCount
+              maxLength={500}
+            />
+          </Card>
 
-        {/* Question Cards */}
-        <Card padding="lg" className="mb-6">
-          {step === 1 && (
-            <>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                What were you working on that mattered most today?
-              </h2>
-              <p className="text-gray-500 text-sm mb-4">
-                Name the focus area, project, or challenge.
-              </p>
+          {/* Question 3: Your part */}
+          <Card padding="lg">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              What was your part?
+            </h2>
+            <p className="text-gray-500 text-sm mb-4">
+              What did you do, decide, or contribute?
+            </p>
+            <Textarea
+              value={yourPart}
+              onChange={(e) => setYourPart(e.target.value)}
+              placeholder="What was your contribution?"
+              rows={3}
+              showCharCount
+              maxLength={500}
+            />
+          </Card>
 
-              {/* Helper chips */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                {HELPER_FRAMINGS.focus.map((text) => (
-                  <button
-                    key={text}
-                    onClick={() => handleHelperClick(text, setFocus, focus)}
-                    className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-brand-primary/10 text-gray-700 hover:text-brand-primary rounded-full transition-colors"
-                  >
-                    {text}
-                  </button>
-                ))}
-              </div>
+          {/* Question 4: Impact */}
+          <Card padding="lg">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              What impact did it have?
+            </h2>
+            <p className="text-gray-500 text-sm mb-4">
+              How did it affect you, others, or the situation?
+            </p>
+            <Textarea
+              value={impact}
+              onChange={(e) => setImpact(e.target.value)}
+              placeholder="Describe the impact..."
+              rows={3}
+              showCharCount
+              maxLength={500}
+            />
+          </Card>
 
-              <Textarea
-                value={focus}
-                onChange={(e) => setFocus(e.target.value)}
-                placeholder="Start typing or tap a phrase above..."
-                rows={3}
-                showCharCount
-                maxLength={300}
-              />
-            </>
-          )}
-
-          {step === 2 && (
-            <>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                What went well?
-              </h2>
-              <p className="text-gray-500 text-sm mb-3">
-                What happened that you want to remember?
-              </p>
-              
-              {/* Rotating awareness insight */}
-              <p className="text-xs text-gray-400 italic mb-4">
-                {insights.whatWentWell}
-              </p>
-
-              {/* Helper chips */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                {HELPER_FRAMINGS.whatWentWell.map((text) => (
-                  <button
-                    key={text}
-                    onClick={() => handleHelperClick(text, setWhatWentWell, whatWentWell)}
-                    className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-brand-primary/10 text-gray-700 hover:text-brand-primary rounded-full transition-colors"
-                  >
-                    {text}
-                  </button>
-                ))}
-              </div>
-
-              <Textarea
-                value={whatWentWell}
-                onChange={(e) => setWhatWentWell(e.target.value)}
-                placeholder="Start typing or tap a phrase above..."
-                rows={4}
-                showCharCount
-                maxLength={500}
-              />
-            </>
-          )}
-
-          {step === 3 && (
-            <>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                What was your part in making that happen?
-              </h2>
-              <p className="text-gray-500 text-sm mb-3">
-                What did you do, decide, or contribute?
-              </p>
-              
-              {/* Rotating awareness insight */}
-              <p className="text-xs text-gray-400 italic mb-4">
-                {insights.yourPart}
-              </p>
-
-              {/* Helper chips */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                {HELPER_FRAMINGS.yourPart.map((text) => (
-                  <button
-                    key={text}
-                    onClick={() => handleHelperClick(text, setYourPart, yourPart)}
-                    className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-brand-primary/10 text-gray-700 hover:text-brand-primary rounded-full transition-colors"
-                  >
-                    {text}
-                  </button>
-                ))}
-              </div>
-
-              <Textarea
-                value={yourPart}
-                onChange={(e) => setYourPart(e.target.value)}
-                placeholder="Start typing or tap a phrase above..."
-                rows={4}
-                showCharCount
-                maxLength={500}
-              />
-            </>
-          )}
-
-          {step === 4 && (
-            <>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                What impact did it have?
-              </h2>
-              <p className="text-gray-500 text-sm mb-3">
-                How did it affect you, others, or the situation?
-              </p>
-              
-              {/* Rotating awareness insight */}
-              <p className="text-xs text-gray-400 italic mb-4">
-                {insights.impact}
-              </p>
-
-              {/* Helper chips */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                {HELPER_FRAMINGS.impact.map((text) => (
-                  <button
-                    key={text}
-                    onClick={() => handleHelperClick(text, setImpact, impact)}
-                    className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-brand-primary/10 text-gray-700 hover:text-brand-primary rounded-full transition-colors"
-                  >
-                    {text}
-                  </button>
-                ))}
-              </div>
-
-              <Textarea
-                value={impact}
-                onChange={(e) => setImpact(e.target.value)}
-                placeholder="Start typing or tap a phrase above..."
-                rows={4}
-                showCharCount
-                maxLength={500}
-              />
-            </>
-          )}
-        </Card>
-
-        {/* Options (shown on last step before submit) */}
-        {step === 4 && (
-          <Card padding="md" className="mb-6">
-            <label className="flex items-center gap-3 cursor-pointer">
-              <div className="relative">
+          {/* Share Toggle */}
+          <Card padding="md">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <div className="relative mt-0.5">
                 <input
                   type="checkbox"
                   checked={shareToCampfire}
@@ -610,51 +545,32 @@ export function ConfirmPage() {
                   }`} />
                 </div>
               </div>
-              <span className="text-sm text-gray-700">Share to Campfire after confirming</span>
+              <div>
+                <span className="text-sm font-medium text-gray-700">Share to Campfire</span>
+                <p className="text-xs text-gray-500 mt-0.5">Your connections can see and be inspired.</p>
+              </div>
             </label>
           </Card>
-        )}
 
-        {/* Error message */}
-        {submitError && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-            <p className="text-sm text-red-700">{submitError}</p>
-          </div>
-        )}
-
-        {/* Navigation buttons */}
-        <div className="space-y-3">
-          {step < 4 ? (
-            <button
-              onClick={() => setStep(step + 1)}
-              disabled={!canProceed()}
-              className={`w-full py-3 px-6 font-semibold rounded-lg transition-colors ${
-                canProceed()
-                  ? 'bg-[#0D7C66] hover:bg-[#095c4d] text-white'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              Continue
-            </button>
-          ) : (
-            <button
-              onClick={handleSubmit}
-              disabled={!canProceed() || isSubmitting}
-              className={`w-full py-3 px-6 font-semibold rounded-lg transition-colors ${
-                canProceed() && !isSubmitting
-                  ? 'bg-[#0D7C66] hover:bg-[#095c4d] text-white'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              {isSubmitting ? 'Analyzing...' : 'Confirm Priority'}
-            </button>
+          {/* Error message */}
+          {submitError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+              <p className="text-sm text-red-700">{submitError}</p>
+            </div>
           )}
 
-          {step === 1 && (
-            <p className="text-center text-sm text-gray-500">
-              Takes about 2 minutes
-            </p>
-          )}
+          {/* Submit button */}
+          <button
+            onClick={handleSubmit}
+            disabled={!canSubmit || isSubmitting}
+            className={`w-full py-3 px-6 font-semibold rounded-lg transition-colors ${
+              canSubmit && !isSubmitting
+                ? 'bg-[#0D7C66] hover:bg-[#095c4d] text-white'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }`}
+          >
+            {isSubmitting ? 'Saving...' : 'Save Priority'}
+          </button>
         </div>
       </div>
     </div>

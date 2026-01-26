@@ -3,37 +3,41 @@ import { useNavigate } from 'react-router-dom'
 import { Card, Badge, FIRES_LABELS, getSupabase, useAuth } from '@finding-good/shared'
 import type { FiresElement } from '@finding-good/shared'
 
-interface ValidationEntry {
+interface PriorityEntry {
   id: string
   created_at: string
   responses: {
+    context?: string
+    what_went_well?: string
+    your_part?: string
+    impact?: string
+    // Support legacy field names too
     focus?: string
     whatWentWell?: string
     yourPart?: string
-    impact?: string
   }
-  proof_line: string
-  fires_extracted: Record<string, { present: boolean; evidence: string; strength: number }> | null
-  validation_signal: string | null
+  integrity_line: string
+  fires_extracted: FiresElement[] | null
+  share_to_feed: boolean
 }
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
   const now = new Date()
   const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
-  
+
   if (diffDays === 0) return 'Today'
   if (diffDays === 1) return 'Yesterday'
   if (diffDays < 7) return `${diffDays} days ago`
-  
+
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
 }
 
 function formatFullDate(dateString: string): string {
   const date = new Date(dateString)
-  return date.toLocaleDateString('en-US', { 
+  return date.toLocaleDateString('en-US', {
     weekday: 'long',
-    month: 'long', 
+    month: 'long',
     day: 'numeric',
     year: 'numeric'
   })
@@ -42,7 +46,7 @@ function formatFullDate(dateString: string): string {
 export function HistoryPage() {
   const navigate = useNavigate()
   const { userEmail } = useAuth()
-  const [entries, setEntries] = useState<ValidationEntry[]>([])
+  const [entries, setEntries] = useState<PriorityEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -50,14 +54,14 @@ export function HistoryPage() {
   useEffect(() => {
     async function fetchHistory() {
       if (!userEmail) return
-      
+
       try {
         const supabase = getSupabase()
         const { data, error: fetchError } = await supabase
-          .from('validations')
-          .select('id, created_at, responses, proof_line, fires_extracted, validation_signal')
+          .from('priorities')
+          .select('id, created_at, responses, integrity_line, fires_extracted, share_to_feed')
           .eq('client_email', userEmail)
-          .eq('mode', 'self')
+          .eq('type', 'self')
           .order('created_at', { ascending: false })
           .limit(50)
 
@@ -76,6 +80,23 @@ export function HistoryPage() {
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id)
+  }
+
+  // Helper to get context field (supports both old and new field names)
+  const getContext = (responses: PriorityEntry['responses']) => {
+    return responses?.context || responses?.focus || ''
+  }
+
+  const getWhatWentWell = (responses: PriorityEntry['responses']) => {
+    return responses?.what_went_well || responses?.whatWentWell || ''
+  }
+
+  const getYourPart = (responses: PriorityEntry['responses']) => {
+    return responses?.your_part || responses?.yourPart || ''
+  }
+
+  const getImpact = (responses: PriorityEntry['responses']) => {
+    return responses?.impact || ''
   }
 
   return (
@@ -103,7 +124,7 @@ export function HistoryPage() {
           <div className="bg-white rounded-lg p-4 mb-6 text-center">
             <p className="text-2xl font-bold text-brand-primary">{entries.length}</p>
             <p className="text-sm text-gray-600">
-              {entries.length === 1 ? 'entry' : 'entries'} captured
+              {entries.length === 1 ? 'priority' : 'priorities'} captured
             </p>
             <p className="text-xs text-gray-400 mt-1">
               Each one builds your evidence library
@@ -136,15 +157,15 @@ export function HistoryPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No entries yet</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No priorities yet</h3>
             <p className="text-gray-600 mb-6">
-              You haven't captured any priorities yet. Each entry takes 2 minutes and builds your evidence of how you show up.
+              You haven't captured any priorities yet. Each entry builds your evidence of how you show up.
             </p>
             <button
               onClick={() => navigate('/confirm')}
               className="px-6 py-2 bg-brand-primary text-white rounded-lg font-medium hover:bg-brand-primary/90 transition-colors"
             >
-              Start Your First Check-in
+              Create Your First Priority
             </button>
           </Card>
         )}
@@ -154,55 +175,59 @@ export function HistoryPage() {
           <div className="space-y-4">
             {entries.map((entry) => {
               const isExpanded = expandedId === entry.id
-              const firesElements = entry.fires_extracted 
-                ? Object.entries(entry.fires_extracted).filter(([_, v]) => v.present)
-                : []
+              const firesElements = entry.fires_extracted || []
+              const contextText = getContext(entry.responses)
 
               return (
-                <Card 
-                  key={entry.id} 
-                  padding="md" 
+                <Card
+                  key={entry.id}
+                  padding="md"
                   className="cursor-pointer hover:shadow-md transition-shadow"
                   onClick={() => toggleExpand(entry.id)}
                 >
                   {/* Header row */}
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <p className="text-sm text-gray-500">{formatDate(entry.created_at)}</p>
-                      {entry.responses?.focus && (
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm text-gray-500">{formatDate(entry.created_at)}</p>
+                        {entry.share_to_feed && (
+                          <span className="text-xs text-brand-primary">Shared</span>
+                        )}
+                      </div>
+                      {contextText && (
                         <p className="text-xs text-gray-400 mt-0.5">
-                          {entry.responses.focus.length > 40 
-                            ? entry.responses.focus.substring(0, 40) + '...' 
-                            : entry.responses.focus}
+                          {contextText.length > 40
+                            ? contextText.substring(0, 40) + '...'
+                            : contextText}
                         </p>
                       )}
                     </div>
-                    <svg 
-                      className={`w-5 h-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
-                      fill="none" 
-                      viewBox="0 0 24 24" 
+                    <svg
+                      className={`w-5 h-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                      fill="none"
+                      viewBox="0 0 24 24"
                       stroke="currentColor"
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
 
-                  {/* Proof line */}
+                  {/* Integrity line */}
                   <p className="text-gray-900 font-medium italic">
-                    "{entry.proof_line}"
+                    "{entry.integrity_line}"
                   </p>
 
                   {/* FIRES badges (collapsed view) */}
                   {!isExpanded && firesElements.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-3">
-                      {firesElements.map(([element]) => (
-                        <Badge 
-                          key={element} 
-                          variant="fires" 
-                          firesElement={element as FiresElement} 
+                      {firesElements.map((element) => (
+                        <Badge
+                          key={element}
+                          variant="fires"
+                          firesElement={element}
                           size="sm"
                         >
-                          {FIRES_LABELS[element as FiresElement]}
+                          {FIRES_LABELS[element]}
                         </Badge>
                       ))}
                     </div>
@@ -212,52 +237,52 @@ export function HistoryPage() {
                   {isExpanded && (
                     <div className="mt-4 pt-4 border-t border-gray-100 space-y-4">
                       <p className="text-xs text-gray-400">{formatFullDate(entry.created_at)}</p>
-                      
-                      {/* FIRES with evidence */}
+
+                      {/* FIRES badges */}
                       {firesElements.length > 0 && (
                         <div className="space-y-2">
                           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                            Elements Present
+                            FIRES Elements
                           </p>
-                          {firesElements.map(([element, data]) => (
-                            <div key={element} className="flex items-start gap-2">
-                              <Badge 
-                                variant="fires" 
-                                firesElement={element as FiresElement} 
+                          <div className="flex flex-wrap gap-2">
+                            {firesElements.map((element) => (
+                              <Badge
+                                key={element}
+                                variant="fires"
+                                firesElement={element}
                                 size="sm"
                               >
-                                {FIRES_LABELS[element as FiresElement]}
+                                {FIRES_LABELS[element]}
                               </Badge>
-                              <span className="text-sm text-gray-600">{data.evidence}</span>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
                       )}
 
                       {/* Original responses */}
                       <div className="space-y-2 text-sm">
-                        {entry.responses?.focus && (
+                        {getContext(entry.responses) && (
                           <div>
-                            <span className="font-medium text-gray-700">Focus:</span>
-                            <p className="text-gray-600">{entry.responses.focus}</p>
+                            <span className="font-medium text-gray-700">What mattered:</span>
+                            <p className="text-gray-600">{getContext(entry.responses)}</p>
                           </div>
                         )}
-                        {entry.responses?.whatWentWell && (
+                        {getWhatWentWell(entry.responses) && (
                           <div>
                             <span className="font-medium text-gray-700">What went well:</span>
-                            <p className="text-gray-600">{entry.responses.whatWentWell}</p>
+                            <p className="text-gray-600">{getWhatWentWell(entry.responses)}</p>
                           </div>
                         )}
-                        {entry.responses?.yourPart && (
+                        {getYourPart(entry.responses) && (
                           <div>
                             <span className="font-medium text-gray-700">Your part:</span>
-                            <p className="text-gray-600">{entry.responses.yourPart}</p>
+                            <p className="text-gray-600">{getYourPart(entry.responses)}</p>
                           </div>
                         )}
-                        {entry.responses?.impact && (
+                        {getImpact(entry.responses) && (
                           <div>
                             <span className="font-medium text-gray-700">Impact:</span>
-                            <p className="text-gray-600">{entry.responses.impact}</p>
+                            <p className="text-gray-600">{getImpact(entry.responses)}</p>
                           </div>
                         )}
                       </div>

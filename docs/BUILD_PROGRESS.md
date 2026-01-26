@@ -12,7 +12,7 @@
 Phase 1: Design ························· ✅ COMPLETE
 Phase 2: Pre-Build Preparation ·········· ✅ COMPLETE
 Phase 3: Foundation Build ··············· ✅ COMPLETE
-Phase 4: Tool Builds (Parallel) ········· 🔄 IN PROGRESS (Proof ✅, Predict ✅)
+Phase 4: Tool Builds (Parallel) ········· 🔄 IN PROGRESS (Proof ✅, Predict ✅, Priority ✅, Permission ✅)
 Phase 5: Integration Build ·············· ⏳ NOT STARTED
 Phase 6: Testing ························ ⏳ NOT STARTED
 ```
@@ -35,9 +35,9 @@ Phase 6: Testing ························ ⏳ NOT STARTE
 | # | Packet | Status | Confidence | Notes |
 |---|--------|--------|------------|-------|
 | 01 | Foundation | ✅ Complete | 🟢 High | |
-| 02 | Permission | ✅ Ready | 🟢 High | |
+| 02 | Permission | ✅ Complete | 🟢 High | Embedded in Together |
 | 03 | Predict | ✅ Complete | 🟢 High | what_matters_most + share toggle |
-| 04 | Priority | ⏳ Pending | — | |
+| 04 | Priority | ✅ Complete | 🟢 High | Single-page + entry paths + share |
 | 05 | Proof | ✅ Complete | 🟢 High | Share toggle added |
 | 06 | Together | ⏳ Pending | — | |
 | 07 | Dashboard | ⏳ Pending | — | |
@@ -67,25 +67,50 @@ Phase 6: Testing ························ ⏳ NOT STARTE
 
 ---
 
-## Session 2: Permission Tool (NEW APP)
+## Session 2: Permission Tool (Embedded in Together)
 
-**Packet:** `docs/build_packets/02_permission_packet.md`  
-**Session File:** `docs/build_sessions/permission_session.md`  
-**Status:** ⏳ NOT STARTED  
+**Packet:** `docs/build_packets/02_permission_packet.md`
+**Session File:** `docs/build_sessions/permission_session.md`
+**Status:** ✅ COMPLETE
 **Depends On:** Foundation complete
 
 ### Checkpoints
 
-- [ ] Focus Setup page renders
-- [ ] Permission/Practice/Focus saves to database
-- [ ] Daily Check-in page renders
-- [ ] Check-in saves to `daily_checkins` table
-- [ ] Bridge question logic works
+- [x] Focus Setup page renders (`/focus`)
+- [x] Permission/Practice/Focus saves to database
+- [x] Daily Check-in page renders (`/today`)
+- [x] Check-in saves to `daily_checkins` table
+- [x] Bridge question logic works (uses `getBridgeQuestion()` from shared)
 
 ### Done Criteria
-- [ ] All P0 features working
-- [ ] Test scenarios pass (Marcus, Sarah)
-- [ ] Ready for Together integration
+- [x] All P0 features working
+- [x] Test scenarios pass (Marcus, Sarah paths covered)
+- [x] Ready for Together integration
+
+### What Was Built
+
+**Routes Added to Together:**
+- `/focus` — FocusSetupPage (set up Permission/Practice/Focus)
+- `/today` — DailyCheckinPage (daily check-in with engagement scoring)
+
+**Components Created (`apps/together/src/components/permission/`):**
+- `FocusItemInput` — Single focus item with optional goal link
+- `FocusSetupForm` — Complete setup form with validation
+- `CheckinFocusRow` — Focus item with checkbox + engagement dots
+- `SomethingElseRow` — "Something else emerged" option
+- `DailyCheckinForm` — Full check-in form
+
+**Hooks Created (`apps/together/src/hooks/`):**
+- `usePermission` — Load/save permission with focus history tracking
+- `useDailyCheckin` — Load/save daily check-in
+
+**Features:**
+- Focus history tracking (logs when items added/removed)
+- One check-in per day enforcement (UNIQUE constraint)
+- Bridge question display after check-in
+- Redirect to setup if no focus configured
+- Readonly view if already checked in today
+- Validation feedback for empty focus items
 
 ---
 
@@ -120,23 +145,32 @@ Phase 6: Testing ························ ⏳ NOT STARTE
 
 ## Session 4: Priority Updates
 
-**Packet:** `docs/build_packets/04_priority_packet.md`  
-**Session File:** `docs/build_sessions/priority_session.md`  
-**Status:** ⏳ NOT STARTED  
+**Packet:** `docs/build_packets/04_priority_packet.md`
+**Session File:** `docs/build_sessions/priority_session.md`
+**Status:** ✅ COMPLETE
 **Depends On:** Foundation complete
 
 ### Checkpoints
 
-- [ ] Single-page redesign renders
-- [ ] Two entry paths work (from check-in, standalone)
-- [ ] Data saves to priorities table
-- [ ] Share to feed toggle works
-- [ ] FIRES extraction still works
+- [x] Single-page redesign renders
+- [x] Two entry paths work (from check-in, standalone)
+- [x] Data saves to priorities table
+- [x] Share to feed toggle works
+- [x] FIRES extraction still works
 
 ### Done Criteria
-- [ ] All P0 features working
-- [ ] Existing functionality preserved
-- [ ] Ready for Together integration
+- [x] All P0 features working
+- [x] Existing functionality preserved
+- [x] Ready for Together integration
+
+### What Was Built
+- Complete redesign of ConfirmPage.tsx: single-page layout with all 4 questions visible
+- Changed database from `validations` → `priorities` table
+- Entry Path 1: URL params (`focus`, `engagement`, `source`, `answer`) for check-in flow
+- Entry Path 2: Standalone with chips from `permissions.focus` or defaults
+- Share toggle saves `share_to_feed` + `shared_at` timestamp
+- FIRES extraction via `priority-analyze` edge function preserved
+- Updated HistoryPage.tsx to read from `priorities` table
 
 ---
 
