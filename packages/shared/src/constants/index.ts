@@ -1,5 +1,14 @@
 import type { FiresElement, Zone } from '../types'
 
+// FIRES Elements Array
+export const FIRES_ELEMENTS: readonly FiresElement[] = [
+  'feelings',
+  'influence',
+  'resilience',
+  'ethics',
+  'strengths',
+] as const
+
 // FIRES Element Colors
 export const FIRES_COLORS: Record<FiresElement, string> = {
   feelings: '#E57373',
@@ -16,6 +25,45 @@ export const FIRES_LABELS: Record<FiresElement, string> = {
   resilience: 'Resilience',
   ethics: 'Ethics',
   strengths: 'Strengths',
+} as const
+
+// FIRES Display - Combined color, label, and description for UI
+export const FIRES_DISPLAY: Record<FiresElement, {
+  color: string
+  label: string
+  initial: string
+  description: string
+}> = {
+  feelings: {
+    color: '#E57373',
+    label: 'Feelings',
+    initial: 'F',
+    description: 'Emotional awareness and expression',
+  },
+  influence: {
+    color: '#64B5F6',
+    label: 'Influence',
+    initial: 'I',
+    description: 'Impact on others and environment',
+  },
+  resilience: {
+    color: '#81C784',
+    label: 'Resilience',
+    initial: 'R',
+    description: 'Ability to recover and adapt',
+  },
+  ethics: {
+    color: '#FFD54F',
+    label: 'Ethics',
+    initial: 'E',
+    description: 'Values and moral principles',
+  },
+  strengths: {
+    color: '#BA68C8',
+    label: 'Strengths',
+    initial: 'S',
+    description: 'Core capabilities and talents',
+  },
 } as const
 
 // Zone Order (progression)
