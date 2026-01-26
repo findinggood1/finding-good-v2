@@ -25,7 +25,8 @@ import {
   getPendingPredictions,
   reviewPrediction,
   interpretValidation,
-  hasPulseForCurrentWeek
+  hasPulseForCurrentWeek,
+  updateValidationShare
 } from '../lib/api';
 import type { FIRESElement, Intensity, QuestionResponse, Prediction } from '../types/validation';
 
@@ -75,6 +76,10 @@ export default function SelfMode() {
   // Clipboard state
   const [clipboardSuccess, setClipboardSuccess] = useState(false);
 
+  // Share to Campfire state
+  const [shareToFeed, setShareToFeed] = useState(false);
+  const [shareUpdating, setShareUpdating] = useState(false);
+
   // Handle clipboard copy with error handling
   const handleCopyToClipboard = async (text: string) => {
     try {
@@ -84,6 +89,28 @@ export default function SelfMode() {
     } catch (err) {
       console.error('[SelfMode] Clipboard copy failed:', err);
       alert('Failed to copy to clipboard. Please copy manually.');
+    }
+  };
+
+  // Handle share to Campfire toggle
+  const handleShareToggle = async (newValue: boolean) => {
+    if (!validationId) {
+      console.error('[SelfMode] No validation ID available for share toggle');
+      return;
+    }
+
+    setShareUpdating(true);
+    try {
+      const result = await updateValidationShare(validationId, newValue);
+      if (result.success) {
+        setShareToFeed(newValue);
+      } else {
+        console.error('[SelfMode] Failed to update share status:', result.error);
+      }
+    } catch (err) {
+      console.error('[SelfMode] Share toggle error:', err);
+    } finally {
+      setShareUpdating(false);
     }
   };
 
@@ -697,6 +724,47 @@ export default function SelfMode() {
                 </div>
               </div>
             </Card>
+
+            {/* Share to Campfire */}
+            {validationId && (
+              <Card variant="elevated" padding="lg">
+                <div className="flex items-start gap-4">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={shareToFeed}
+                    disabled={shareUpdating}
+                    onClick={() => handleShareToggle(!shareToFeed)}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-fg-primary focus:ring-offset-2 ${
+                      shareToFeed ? 'bg-fg-primary' : 'bg-gray-200'
+                    } ${shareUpdating ? 'opacity-50 cursor-wait' : ''}`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                        shareToFeed ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                  <div className="flex-1">
+                    <h3 className="text-base font-medium text-gray-900">
+                      Share to Campfire
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Your connections can see and learn from your process.
+                    </p>
+                  </div>
+                </div>
+                {/* Confirmation message when shared */}
+                {shareToFeed && !shareUpdating && (
+                  <div className="mt-4 flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Shared to Campfire</span>
+                  </div>
+                )}
+              </Card>
+            )}
 
             <Button
               variant="primary"

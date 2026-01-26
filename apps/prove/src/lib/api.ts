@@ -124,6 +124,33 @@ export async function getValidation(id: string): Promise<ApiResponse<Validation>
   }
 }
 
+/**
+ * Update validation share status (for Campfire feed)
+ * Uses share_to_feed column (V4 standard)
+ */
+export async function updateValidationShare(
+  validationId: string,
+  shareToFeed: boolean
+): Promise<ApiResponse<Validation>> {
+  try {
+    const { data, error } = await supabase
+      .from('validations')
+      .update({
+        share_to_feed: shareToFeed,
+        shared_at: shareToFeed ? new Date().toISOString() : null,
+      })
+      .eq('id', validationId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error updating validation share status:', error);
+    return { success: false, error: String(error) };
+  }
+}
+
 // =============================================================================
 // INVITATION OPERATIONS (Other Mode)
 // =============================================================================
