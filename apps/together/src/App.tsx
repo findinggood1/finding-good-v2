@@ -12,6 +12,8 @@ import {
   SettingsPage,
   LoginPage,
   AuthCallbackPage,
+  FocusSetupPage,
+  DailyCheckinPage,
 } from './pages'
 import {
   ClientsPage,
@@ -117,6 +119,26 @@ function App() {
             <ProtectedRoute>
               <AppLayout>
                 <SettingsPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/focus"
+          element={
+            <ProtectedRoute>
+              <AppLayout activeNav="home">
+                <FocusSetupPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/today"
+          element={
+            <ProtectedRoute>
+              <AppLayout activeNav="home">
+                <DailyCheckinPage />
               </AppLayout>
             </ProtectedRoute>
           }

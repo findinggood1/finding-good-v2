@@ -23,3 +23,7 @@ export { usePendingAsks, type PendingAsk } from './usePendingAsks'
 
 // P1 Hooks - Exchange actions
 export { useExchangeActions, type ImpactLevel } from './useExchangeActions'
+
+// Permission Hooks
+export { usePermission, type UsePermissionReturn } from './usePermission'
+export { useDailyCheckin, type UseDailyCheckinReturn } from './useDailyCheckin'
