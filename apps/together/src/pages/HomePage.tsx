@@ -1,29 +1,30 @@
 import { LoadingSpinner } from '@finding-good/shared'
 import { PredictionsHeader, FeedCard } from '../components'
-import { PredictabilityCard, FiresGrid, ActivityCounts, EvidenceList, NoticingCard } from '../components/home'
+import { InfluenceSection, DailyCheckin, ThisWeekSection, RecentActivitySection, InsightsSection } from '../components/home'
+import { usePermission } from '../hooks/usePermission'
+import { useDailyReflection } from '../hooks/useDailyReflection'
 import { usePredictions } from '../hooks/usePredictions'
 import { useFeed } from '../hooks/useFeed'
-import { useActivityCounts } from '../hooks/useActivityCounts'
-import { useThisWeeksEvidence } from '../hooks/useThisWeeksEvidence'
-import { useNoticingInOthers } from '../hooks/useNoticingInOthers'
-import { useZoneData } from '../hooks/useZoneData'
+import { useWeeklyActivity } from '../hooks/useWeeklyActivity'
+import { useRecentActivity } from '../hooks/useRecentActivity'
 
 export function HomePage() {
+  const { permission, loading: permissionLoading, savePermission } = usePermission()
+  const {
+    reflection, loading: reflectionLoading,
+    toggleFocusItem, setEngagement, saveAnswer,
+  } = useDailyReflection()
   const { predictions, loading: predictionsLoading } = usePredictions()
   const { items: feedItems, loading: feedLoading } = useFeed()
-  const { counts, loading: countsLoading } = useActivityCounts('week')
-  const { evidence, loading: evidenceLoading } = useThisWeeksEvidence()
-  const { firesFrequency, recentCount, question, loading: noticingLoading } = useNoticingInOthers()
-  const { zoneBreakdown, growthOpportunity, loading: zoneLoading } = useZoneData()
+  const {
+    activePredictions: weeklyPredictions, impactCount, improveCount, checkinCount,
+    loading: weeklyLoading,
+  } = useWeeklyActivity()
+  const { sent, received, loading: recentLoading } = useRecentActivity()
 
-  // Get predictability data from first active prediction
-  const activePrediction = predictions.find(p => p.status === 'active')
-  // Type assertion - current_predictability_score exists in DB but not in shared types
-  const predictabilityScore = (activePrediction as { current_predictability_score?: number } | undefined)?.current_predictability_score ?? null
+  const loading = predictionsLoading || feedLoading
 
-  const loading = predictionsLoading || feedLoading || countsLoading || evidenceLoading || noticingLoading || zoneLoading
-
-  if (loading) {
+  if (loading && permissionLoading) {
     return (
       <div className="flex items-center justify-center py-20">
         <LoadingSpinner size="lg" />
@@ -33,43 +34,67 @@ export function HomePage() {
 
   return (
     <div className="space-y-4 pb-20">
-      {/* Predictions Header */}
-      <PredictionsHeader predictions={predictions} />
-
-      {/* Main content grid */}
-      <div className="px-4 space-y-4">
-        {/* Predictability Score */}
-        <PredictabilityCard
-          score={predictabilityScore}
-          trend={null}
-          clarity={null}
-          confidence={null}
-          connection={null}
-        />
-
-        {/* FIRES Grid */}
-        <FiresGrid
-          zoneBreakdown={zoneBreakdown}
-          growthEdge={growthOpportunity?.element ?? null}
-        />
-
-        {/* Activity Counts */}
-        <ActivityCounts counts={counts} scope="week" />
-
-        {/* This Week's Evidence */}
-        <EvidenceList items={evidence} />
-
-        {/* What You're Noticing */}
-        <NoticingCard
-          firesFrequency={firesFrequency}
-          recentCount={recentCount}
-          question={question}
+      {/* 1. Your Influence */}
+      <div className="px-4 pt-4">
+        <InfluenceSection
+          permission={permission}
+          loading={permissionLoading}
+          onSave={savePermission}
         />
       </div>
 
-      {/* Feed */}
+      {/* 2. What You're Creating (Predictions) */}
+      <PredictionsHeader predictions={predictions} />
+
+      {/* 3. Today's Check-in */}
+      <div className="px-4">
+        <DailyCheckin
+          focusItems={permission?.focus || []}
+          reflection={reflection}
+          loading={reflectionLoading}
+          weeklyCheckinCount={checkinCount}
+          onToggleItem={toggleFocusItem}
+          onSetEngagement={setEngagement}
+          onSaveAnswer={saveAnswer}
+        />
+      </div>
+
+      {/* 4. This Week */}
+      <div className="px-4">
+        <ThisWeekSection
+          activePredictions={weeklyPredictions}
+          impactCount={impactCount}
+          improveCount={improveCount}
+          loading={weeklyLoading}
+        />
+      </div>
+
+      {/* 5. Recent Activity */}
+      <div className="px-4">
+        <RecentActivitySection
+          sent={sent}
+          received={received}
+          loading={recentLoading}
+        />
+      </div>
+
+      {/* 6. Insights */}
+      <div className="px-4">
+        <InsightsSection
+          reflection={reflection}
+          weeklyCheckinCount={checkinCount}
+          weeklyActivity={{
+            activePredictions: weeklyPredictions,
+            impactCount,
+            improveCount,
+            checkinCount,
+          }}
+        />
+      </div>
+
+      {/* 7. Feed */}
       <div className="px-4 space-y-3">
-        <div className="text-sm font-medium text-gray-600">RECENT ACTIVITY</div>
+        <div className="text-sm font-medium text-gray-600">FEED</div>
         {feedItems.length === 0 ? (
           <EmptyFeedState hasPredictions={predictions.length > 0} />
         ) : (
@@ -83,48 +108,18 @@ export function HomePage() {
 }
 
 function EmptyFeedState({ hasPredictions }: { hasPredictions: boolean }) {
-  if (!hasPredictions) {
-    return (
-      <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 text-center">
-        <div className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-          </svg>
-        </div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">
-          What are you working on?
-        </h2>
-        <p className="text-gray-600 text-sm mb-6">
-          Create your first prediction to start building clarity.
-        </p>
-        <a
-          href="http://localhost:3001/new"
-          className="inline-flex items-center px-4 py-2 bg-brand-primary text-white font-medium rounded-lg hover:bg-brand-primary/90 transition-colors"
-        >
-          Create your first prediction
-        </a>
-      </div>
-    )
-  }
-
   return (
-    <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 text-center">
-      <div className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-        <svg className="w-8 h-8 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-        </svg>
-      </div>
-      <h2 className="text-lg font-semibold text-gray-900 mb-2">
-        Your feed will fill as you practice
-      </h2>
-      <p className="text-gray-600 text-sm mb-6">
-        Add priorities and proofs to build your clarity journal.
+    <div className="bg-gray-50 rounded-lg border border-gray-100 p-4 text-center">
+      <p className="text-sm text-gray-500">
+        {hasPredictions
+          ? 'Your feed will fill as you record impact and improvements.'
+          : 'Define a belief to start building clarity.'}
       </p>
       <a
-        href="http://localhost:3002"
-        className="inline-flex items-center px-4 py-2 bg-brand-primary text-white font-medium rounded-lg hover:bg-brand-primary/90 transition-colors"
+        href={hasPredictions ? '/impact/self' : '/inspire/self'}
+        className="inline-block mt-2 text-sm font-medium text-brand-primary hover:underline"
       >
-        Add a priority
+        {hasPredictions ? 'Record your impact' : 'Define your first belief'}
       </a>
     </div>
   )

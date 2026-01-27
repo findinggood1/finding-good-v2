@@ -27,3 +27,9 @@ export { useExchangeActions, type ImpactLevel } from './useExchangeActions'
 // Permission Hooks
 export { usePermission, type UsePermissionReturn } from './usePermission'
 export { useDailyCheckin, type UseDailyCheckinReturn } from './useDailyCheckin'
+export { useDailyReflection, type DailyReflection, type UseDailyReflectionReturn } from './useDailyReflection'
+export { useWeeklyActivity, type WeeklyActivity } from './useWeeklyActivity'
+export { useRecentActivity, type ActivityEntry } from './useRecentActivity'
+
+// Role Hooks
+export { useUserRole, type UserRole } from './useUserRole'
