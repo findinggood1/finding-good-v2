@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ProtectedRoute } from '@finding-good/shared'
 import {
   HomePage,
@@ -12,8 +12,19 @@ import {
   SettingsPage,
   LoginPage,
   AuthCallbackPage,
-  FocusSetupPage,
-  DailyCheckinPage,
+  ProfilePage,
+  LearnPage,
+  ChatPage,
+  ImpactLandingPage,
+  ImpactSelfPage,
+  ImpactOthersPage,
+  ImproveLandingPage,
+  ImproveSelfPage,
+  ImproveOthersPage,
+  InspireLandingPage,
+  InspireSelfPage,
+  InspireOthersPage,
+  PartnershipViewPage,
 } from './pages'
 import {
   ClientsPage,
@@ -22,7 +33,7 @@ import {
   MyPracticePage,
   AdminPage,
 } from './pages/coach'
-import { AppLayout, CoachLayout } from './components'
+import { AppLayout, CoachLayout, RoleGate, LockedFeature } from './components'
 
 function App() {
   return (
@@ -32,83 +43,210 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
-        {/* Protected routes with bottom nav */}
+        {/* Home (Influence) */}
         <Route
           path="/"
           element={
             <ProtectedRoute>
-              <AppLayout activeNav="home">
+              <AppLayout>
                 <HomePage />
               </AppLayout>
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/prediction/:id"
-          element={
-            <ProtectedRoute>
-              <AppLayout activeNav="home">
-                <PredictionDetailPage />
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/home" element={<Navigate to="/" replace />} />
+
+        {/* Campfire */}
         <Route
           path="/campfire"
           element={
             <ProtectedRoute>
-              <AppLayout activeNav="campfire">
+              <AppLayout>
                 <CampfirePage />
               </AppLayout>
             </ProtectedRoute>
           }
         />
+
+        {/* Exchange */}
         <Route
           path="/exchange"
           element={
             <ProtectedRoute>
-              <AppLayout activeNav="exchange">
+              <AppLayout>
                 <ExchangePage />
               </AppLayout>
             </ProtectedRoute>
           }
         />
         <Route
-          path="/connections"
+          path="/exchange/:partnerId"
           element={
             <ProtectedRoute>
-              <AppLayout activeNav="exchange">
-                <ConnectionsPage />
+              <AppLayout>
+                <PartnershipViewPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Impact (was Priority) */}
+        <Route
+          path="/impact"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <ImpactLandingPage />
               </AppLayout>
             </ProtectedRoute>
           }
         />
         <Route
-          path="/connection/:id"
+          path="/impact/self"
           element={
             <ProtectedRoute>
-              <AppLayout activeNav="exchange">
-                <ConnectionDetailPage />
+              <AppLayout>
+                <ImpactSelfPage />
               </AppLayout>
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/impact/others"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <ImpactOthersPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Improve (was Proof) */}
+        <Route
+          path="/improve"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <ImproveLandingPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/improve/self"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <ImproveSelfPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/improve/others"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <ImproveOthersPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Inspire (was Predict) */}
+        <Route
+          path="/inspire"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <InspireLandingPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/inspire/self"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <InspireSelfPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/inspire/others"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <InspireOthersPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Direction (locked for non-clients) */}
         <Route
           path="/map"
           element={
             <ProtectedRoute>
-              <AppLayout activeNav="map">
-                <MapPage />
+              <AppLayout>
+                <RoleGate
+                  allowedRoles={['client', 'coach', 'admin']}
+                  fallback={
+                    <LockedFeature
+                      featureName="Map"
+                      description="Track your trajectory and see how your FIRES scores evolve over time."
+                      icon="🧭"
+                    />
+                  }
+                >
+                  <MapPage />
+                </RoleGate>
               </AppLayout>
             </ProtectedRoute>
           }
         />
         <Route
-          path="/maps"
+          path="/chat"
           element={
             <ProtectedRoute>
-              <AppLayout activeNav="maps">
-                <MapsPage />
+              <AppLayout>
+                <RoleGate
+                  allowedRoles={['client', 'coach', 'admin']}
+                  fallback={
+                    <LockedFeature
+                      featureName="Chat"
+                      description="Connect directly with your coach for guidance and reflection."
+                      icon="💬"
+                    />
+                  }
+                >
+                  <ChatPage />
+                </RoleGate>
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Utility */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <ProfilePage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/learn"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <LearnPage />
               </AppLayout>
             </ProtectedRoute>
           }
@@ -123,22 +261,54 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Redirects for old routes */}
+        <Route path="/today" element={<Navigate to="/" replace />} />
+        <Route path="/focus" element={<Navigate to="/" replace />} />
+        <Route path="/priority" element={<Navigate to="/impact/self" replace />} />
+        <Route path="/priority/*" element={<Navigate to="/impact/self" replace />} />
+        <Route path="/proof" element={<Navigate to="/improve/self" replace />} />
+        <Route path="/proof/*" element={<Navigate to="/improve/self" replace />} />
+        <Route path="/predict" element={<Navigate to="/inspire/self" replace />} />
+        <Route path="/predict/*" element={<Navigate to="/inspire/self" replace />} />
+
+        {/* Legacy routes kept for compatibility */}
         <Route
-          path="/focus"
+          path="/prediction/:id"
           element={
             <ProtectedRoute>
-              <AppLayout activeNav="home">
-                <FocusSetupPage />
+              <AppLayout>
+                <PredictionDetailPage />
               </AppLayout>
             </ProtectedRoute>
           }
         />
         <Route
-          path="/today"
+          path="/connections"
           element={
             <ProtectedRoute>
-              <AppLayout activeNav="home">
-                <DailyCheckinPage />
+              <AppLayout>
+                <ConnectionsPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/connection/:id"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <ConnectionDetailPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/maps"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <MapsPage />
               </AppLayout>
             </ProtectedRoute>
           }

@@ -1,11 +1,12 @@
 import { type ReactNode } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { BottomNav, type NavItem } from '@finding-good/shared'
-import { useIsCoach } from '../hooks'
+import { useUserRole } from '../hooks/useUserRole'
+import { Sidebar } from './layout'
 
 interface AppLayoutProps {
   children: ReactNode
-  activeNav?: 'home' | 'exchange' | 'campfire' | 'map' | 'maps'
+  activeNav?: 'home' | 'today' | 'priority' | 'proof' | 'predict' | 'map' | 'exchange' | 'campfire' | 'maps'
 }
 
 const HomeIcon = () => (
@@ -48,26 +49,27 @@ const CoachIcon = () => (
 
 export function AppLayout({ children, activeNav }: AppLayoutProps) {
   const navigate = useNavigate()
-  const { isCoach } = useIsCoach()
+  const { role } = useUserRole()
+  const isCoach = role === 'coach' || role === 'admin'
 
   const navItems: NavItem[] = [
     {
       id: 'home',
       label: 'Home',
       icon: <HomeIcon />,
-      href: '/',
+      href: '/home',
     },
     {
-      id: 'exchange',
-      label: 'Exchange',
-      icon: <ExchangeIcon />,
-      href: '/exchange',
-    },
-    {
-      id: 'campfire',
-      label: 'Campfire',
+      id: 'today',
+      label: 'Today',
       icon: <CampfireIcon />,
-      href: '/campfire',
+      href: '/today',
+    },
+    {
+      id: 'priority',
+      label: 'Priority',
+      icon: <ExchangeIcon />,
+      href: '/priority',
     },
     {
       id: 'map',
@@ -84,43 +86,53 @@ export function AppLayout({ children, activeNav }: AppLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-brand-cream pb-20">
-      {/* Top bar with settings */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
-        <div className="flex items-center justify-between px-4 h-14">
-          <h1 className="text-lg font-bold text-brand-primary">Together</h1>
-          <div className="flex items-center gap-2">
-            {isCoach && (
+    <div className="min-h-screen bg-brand-cream flex">
+      {/* Sidebar - hidden on mobile, visible on md+ */}
+      <div className="hidden md:flex md:flex-shrink-0">
+        <Sidebar />
+      </div>
+
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top bar with settings - mobile only */}
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-30 md:hidden">
+          <div className="flex items-center justify-between px-4 h-14">
+            <h1 className="text-lg font-bold text-brand-primary">Together</h1>
+            <div className="flex items-center gap-2">
+              {isCoach && (
+                <Link
+                  to="/coach/clients"
+                  className="p-2 text-gray-500 hover:text-brand-primary transition-colors"
+                  aria-label="Coach Dashboard"
+                >
+                  <CoachIcon />
+                </Link>
+              )}
               <Link
-                to="/coach/clients"
+                to="/settings"
                 className="p-2 text-gray-500 hover:text-brand-primary transition-colors"
-                aria-label="Coach Dashboard"
+                aria-label="Settings"
               >
-                <CoachIcon />
+                <SettingsIcon />
               </Link>
-            )}
-            <Link
-              to="/settings"
-              className="p-2 text-gray-500 hover:text-brand-primary transition-colors"
-              aria-label="Settings"
-            >
-              <SettingsIcon />
-            </Link>
+            </div>
           </div>
+        </header>
+
+        {/* Main content */}
+        <main className="flex-1 pb-20 md:pb-0">
+          {children}
+        </main>
+
+        {/* Bottom navigation - mobile only */}
+        <div className="md:hidden">
+          <BottomNav
+            items={navItems}
+            activeId={activeNav}
+            onNavigate={handleNavigate}
+          />
         </div>
-      </header>
-
-      {/* Main content */}
-      <main>
-        {children}
-      </main>
-
-      {/* Bottom navigation */}
-      <BottomNav
-        items={navItems}
-        activeId={activeNav}
-        onNavigate={handleNavigate}
-      />
+      </div>
     </div>
   )
 }
