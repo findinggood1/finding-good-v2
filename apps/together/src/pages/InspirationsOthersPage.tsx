@@ -25,7 +25,7 @@ interface InspireResult {
   shareUrl: string
 }
 
-export function InspireOthersPage() {
+export function InspirationsOthersPage() {
   const navigate = useNavigate()
   const { userEmail } = useAuth()
   const [step, setStep] = useState(1)
@@ -79,7 +79,7 @@ export function InspireOthersPage() {
         throw new Error('Failed to save. Please try again.')
       }
 
-      const shareUrl = `${window.location.origin}/inspire/view/${shareId}`
+      const shareUrl = `${window.location.origin}/inspirations/view/${shareId}`
 
       setResult({
         shareId,
@@ -214,15 +214,15 @@ export function InspireOthersPage() {
               variant="ghost"
               size="lg"
               className="w-full"
-              onClick={() => navigate('/inspire')}
+              onClick={() => navigate('/inspirations')}
             >
               Done
             </Button>
           </div>
 
           <div className="mt-6 text-center">
-            <Link to="/inspire" className="text-sm text-brand-primary hover:underline">
-              Back to Inspire
+            <Link to="/inspirations" className="text-sm text-brand-primary hover:underline">
+              Back to Inspirations
             </Link>
           </div>
         </div>
@@ -236,7 +236,7 @@ export function InspireOthersPage() {
         {/* Header with back button and progress */}
         <div className="flex items-center justify-between mb-6">
           <button
-            onClick={() => step > 1 ? setStep(step - 1) : navigate('/inspire')}
+            onClick={() => step > 1 ? setStep(step - 1) : navigate('/inspirations')}
             className="flex items-center gap-1 text-gray-500 hover:text-brand-primary transition-colors"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

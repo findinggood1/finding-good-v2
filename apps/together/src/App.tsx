@@ -15,16 +15,16 @@ import {
   ProfilePage,
   LearnPage,
   ChatPage,
-  ImpactLandingPage,
-  ImpactSelfPage,
-  ImpactOthersPage,
-  ImproveLandingPage,
-  ImproveSelfPage,
-  ImproveOthersPage,
-  InspireLandingPage,
-  InspireSelfPage,
-  InspireOthersPage,
-  InspireRecipientView,
+  ImpactsLandingPage,
+  ImpactsSelfPage,
+  ImpactsOthersPage,
+  InsightsLandingPage,
+  InsightsSelfPage,
+  InsightsOthersPage,
+  InspirationsLandingPage,
+  InspirationsSelfPage,
+  InspirationsOthersPage,
+  InspirationsRecipientView,
   PartnershipViewPage,
 } from './pages'
 import {
@@ -43,7 +43,7 @@ function App() {
         {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
-        <Route path="/inspire/view/:shareId" element={<InspireRecipientView />} />
+        <Route path="/inspirations/view/:shareId" element={<InspirationsRecipientView />} />
 
         {/* Home (Influence) */}
         <Route
@@ -92,97 +92,97 @@ function App() {
           }
         />
 
-        {/* Impact (was Priority) */}
+        {/* Impacts */}
         <Route
-          path="/impact"
+          path="/impacts"
           element={
             <ProtectedRoute>
               <AppLayout>
-                <ImpactLandingPage />
+                <ImpactsLandingPage />
               </AppLayout>
             </ProtectedRoute>
           }
         />
         <Route
-          path="/impact/self"
+          path="/impacts/self"
           element={
             <ProtectedRoute>
               <AppLayout>
-                <ImpactSelfPage />
+                <ImpactsSelfPage />
               </AppLayout>
             </ProtectedRoute>
           }
         />
         <Route
-          path="/impact/others"
+          path="/impacts/others"
           element={
             <ProtectedRoute>
               <AppLayout>
-                <ImpactOthersPage />
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Improve (was Proof) */}
-        <Route
-          path="/improve"
-          element={
-            <ProtectedRoute>
-              <AppLayout>
-                <ImproveLandingPage />
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/improve/self"
-          element={
-            <ProtectedRoute>
-              <AppLayout>
-                <ImproveSelfPage />
-              </AppLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/improve/others"
-          element={
-            <ProtectedRoute>
-              <AppLayout>
-                <ImproveOthersPage />
+                <ImpactsOthersPage />
               </AppLayout>
             </ProtectedRoute>
           }
         />
 
-        {/* Inspire (was Predict) */}
+        {/* Insights */}
         <Route
-          path="/inspire"
+          path="/insights"
           element={
             <ProtectedRoute>
               <AppLayout>
-                <InspireLandingPage />
+                <InsightsLandingPage />
               </AppLayout>
             </ProtectedRoute>
           }
         />
         <Route
-          path="/inspire/self"
+          path="/insights/self"
           element={
             <ProtectedRoute>
               <AppLayout>
-                <InspireSelfPage />
+                <InsightsSelfPage />
               </AppLayout>
             </ProtectedRoute>
           }
         />
         <Route
-          path="/inspire/others"
+          path="/insights/others"
           element={
             <ProtectedRoute>
               <AppLayout>
-                <InspireOthersPage />
+                <InsightsOthersPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Inspirations */}
+        <Route
+          path="/inspirations"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <InspirationsLandingPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/inspirations/self"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <InspirationsSelfPage />
+              </AppLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/inspirations/others"
+          element={
+            <ProtectedRoute>
+              <AppLayout>
+                <InspirationsOthersPage />
               </AppLayout>
             </ProtectedRoute>
           }
@@ -267,12 +267,23 @@ function App() {
         {/* Redirects for old routes */}
         <Route path="/today" element={<Navigate to="/" replace />} />
         <Route path="/focus" element={<Navigate to="/" replace />} />
-        <Route path="/priority" element={<Navigate to="/impact/self" replace />} />
-        <Route path="/priority/*" element={<Navigate to="/impact/self" replace />} />
-        <Route path="/proof" element={<Navigate to="/improve/self" replace />} />
-        <Route path="/proof/*" element={<Navigate to="/improve/self" replace />} />
-        <Route path="/predict" element={<Navigate to="/inspire/self" replace />} />
-        <Route path="/predict/*" element={<Navigate to="/inspire/self" replace />} />
+        <Route path="/priority" element={<Navigate to="/impacts/self" replace />} />
+        <Route path="/priority/*" element={<Navigate to="/impacts/self" replace />} />
+        <Route path="/proof" element={<Navigate to="/insights/self" replace />} />
+        <Route path="/proof/*" element={<Navigate to="/insights/self" replace />} />
+        <Route path="/predict" element={<Navigate to="/inspirations/self" replace />} />
+        <Route path="/predict/*" element={<Navigate to="/inspirations/self" replace />} />
+        {/* Redirects from old verb routes to new noun routes */}
+        <Route path="/impact" element={<Navigate to="/impacts" replace />} />
+        <Route path="/impact/self" element={<Navigate to="/impacts/self" replace />} />
+        <Route path="/impact/others" element={<Navigate to="/impacts/others" replace />} />
+        <Route path="/improve" element={<Navigate to="/insights" replace />} />
+        <Route path="/improve/self" element={<Navigate to="/insights/self" replace />} />
+        <Route path="/improve/others" element={<Navigate to="/insights/others" replace />} />
+        <Route path="/inspire" element={<Navigate to="/inspirations" replace />} />
+        <Route path="/inspire/self" element={<Navigate to="/inspirations/self" replace />} />
+        <Route path="/inspire/others" element={<Navigate to="/inspirations/others" replace />} />
+        <Route path="/inspire/view/:shareId" element={<InspirationsRecipientView />} />
 
         {/* Legacy routes kept for compatibility */}
         <Route

@@ -77,32 +77,32 @@ export function Sidebar() {
           <div className="mt-1 space-y-0.5">
             <NavDropdown
               icon="⚡"
-              label="Impact"
-              basePath="/impact"
+              label="Impacts"
+              basePath="/impacts"
               children={[
-                { to: '/impact', label: 'About Impact' },
-                { to: '/impact/self', label: 'For Yourself' },
-                { to: '/impact/others', label: 'For Others' },
+                { to: '/impacts', label: 'About Impacts' },
+                { to: '/impacts/self', label: 'For Yourself' },
+                { to: '/impacts/others', label: 'For Others' },
               ]}
             />
             <NavDropdown
               icon="📈"
-              label="Improve"
-              basePath="/improve"
+              label="Insights"
+              basePath="/insights"
               children={[
-                { to: '/improve', label: 'About Improve' },
-                { to: '/improve/self', label: 'For Yourself' },
-                { to: '/improve/others', label: 'For Others' },
+                { to: '/insights', label: 'About Insights' },
+                { to: '/insights/self', label: 'For Yourself' },
+                { to: '/insights/others', label: 'For Others' },
               ]}
             />
             <NavDropdown
               icon="✨"
-              label="Inspire"
-              basePath="/inspire"
+              label="Inspirations"
+              basePath="/inspirations"
               children={[
-                { to: '/inspire', label: 'About Inspire' },
-                { to: '/inspire/self', label: 'For Yourself' },
-                { to: '/inspire/others', label: 'For Others' },
+                { to: '/inspirations', label: 'About Inspirations' },
+                { to: '/inspirations/self', label: 'For Yourself' },
+                { to: '/inspirations/others', label: 'For Others' },
               ]}
             />
           </div>

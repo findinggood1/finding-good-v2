@@ -1,10 +1,10 @@
 import { ProofPage } from './ProofPage'
 
-export function ImproveOthersPage() {
+export function InsightsOthersPage() {
   return (
     <ProofPage
       pageTitle="Witness Someone's Growth"
-      toolName="Improvement"
+      toolName="Insights"
       mode="send"
     />
   )

@@ -30,7 +30,8 @@
       "mcp__supabase__execute_sql",
       "Bash(git push:*)",
       "mcp__supabase__list_tables",
-      "mcp__supabase__apply_migration"
+      "mcp__supabase__apply_migration",
+      "Bash(git status:*)"
     ]
   }
 }

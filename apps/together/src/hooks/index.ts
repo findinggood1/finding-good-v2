@@ -36,3 +36,9 @@ export { useUserRole, type UserRole } from './useUserRole'
 
 // Tool Landing Page Hooks
 export { useRecentToolEntries } from './useRecentToolEntries'
+
+// Exchange Partnership Hooks (Phase D)
+export { useExchangePartners, type ExchangePartner } from './useExchangePartners'
+export { useExchangeInvitations, type PendingInvitation } from './useExchangeInvitations'
+export { usePartnershipActivity, type PartnerActivityEntry, type PartnershipActivity } from './usePartnershipActivity'
+export { usePartnerInfluence, type PartnerInfluence, type UsePartnerInfluenceReturn } from './usePartnerInfluence'

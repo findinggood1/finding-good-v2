@@ -1,5 +1,5 @@
 import { PredictPage } from './PredictPage'
 
-export function InspireSelfPage() {
+export function InspirationsSelfPage() {
   return <PredictPage pageTitle="Define Your Beliefs" />
 }

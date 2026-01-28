@@ -403,12 +403,12 @@
 
 ## SUMMARY: Features by Phase
 
-### Phase F.0: Terminology Rename (PREP) 🔨 IN PROGRESS
-- "Impact" → "Impacts" (routes, nav, pages, components)
-- "Improve" → "Insights" (routes, nav, pages, components)
-- "Inspire" → "Inspirations" (routes, nav, pages, components)
-- Update all imports and references
-- Test all routes still work
+### Phase F.0: Terminology Rename (PREP) ✅ COMPLETE
+- "Impact" → "Impacts" (routes, nav, pages, components) ✓
+- "Improve" → "Insights" (routes, nav, pages, components) ✓
+- "Inspire" → "Inspirations" (routes, nav, pages, components) ✓
+- Update all imports and references ✓
+- Test all routes still work ✓
 
 ### Phase F: Send Tools
 - Impact Others wizard (6 steps)

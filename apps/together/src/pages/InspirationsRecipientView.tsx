@@ -15,7 +15,7 @@ interface InspirationData {
   created_at: string
 }
 
-export function InspireRecipientView() {
+export function InspirationsRecipientView() {
   const { shareId } = useParams<{ shareId: string }>()
   const [inspiration, setInspiration] = useState<InspirationData | null>(null)
   const [loading, setLoading] = useState(true)

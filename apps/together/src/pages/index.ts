@@ -19,21 +19,21 @@ export { ProfilePage } from './ProfilePage'
 export { LearnPage } from './LearnPage'
 export { ChatPage } from './ChatPage'
 
-// New: Impact (was Priority)
-export { ImpactLandingPage } from './ImpactLandingPage'
-export { ImpactSelfPage } from './ImpactSelfPage'
-export { ImpactOthersPage } from './ImpactOthersPage'
+// Impacts (was Impact/Priority)
+export { ImpactsLandingPage } from './ImpactsLandingPage'
+export { ImpactsSelfPage } from './ImpactsSelfPage'
+export { ImpactsOthersPage } from './ImpactsOthersPage'
 
-// New: Improve (was Proof)
-export { ImproveLandingPage } from './ImproveLandingPage'
-export { ImproveSelfPage } from './ImproveSelfPage'
-export { ImproveOthersPage } from './ImproveOthersPage'
+// Insights (was Improve/Proof)
+export { InsightsLandingPage } from './InsightsLandingPage'
+export { InsightsSelfPage } from './InsightsSelfPage'
+export { InsightsOthersPage } from './InsightsOthersPage'
 
-// New: Inspire (was Predict)
-export { InspireLandingPage } from './InspireLandingPage'
-export { InspireSelfPage } from './InspireSelfPage'
-export { InspireOthersPage } from './InspireOthersPage'
-export { InspireRecipientView } from './InspireRecipientView'
+// Inspirations (was Inspire/Predict)
+export { InspirationsLandingPage } from './InspirationsLandingPage'
+export { InspirationsSelfPage } from './InspirationsSelfPage'
+export { InspirationsOthersPage } from './InspirationsOthersPage'
+export { InspirationsRecipientView } from './InspirationsRecipientView'
 
 // New: Exchange / Partnership
 export { PartnershipViewPage } from './PartnershipViewPage'

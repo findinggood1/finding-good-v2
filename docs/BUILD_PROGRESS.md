@@ -19,8 +19,8 @@ Phase C: Tool Landing Pages + Inspire ··· ✅ COMPLETE
 Phase D: Exchange ······················· ✅ COMPLETE
 Phase E: Dashboard ······················ ✅ COMPLETE
 
-NEXT (Sequential):
-Phase F.0: Terminology Rename ··········· 📋 READY (Impact→Impacts, Improve→Insights, Inspire→Inspirations)
+COMPLETED:
+Phase F.0: Terminology Rename ··········· ✅ COMPLETE (Impact→Impacts, Improve→Insights, Inspire→Inspirations)
 
 NEXT (Parallel - after F.0):
 ├── Phase F: Send Tools ················· 📋 READY (Impacts/Insights Others wizards)
@@ -63,26 +63,26 @@ Phase E.5: Dashboard Sent/Received ······ ⏳ LOW PRIORITY (can defer)
 
 ---
 
-## Phase F.0: Terminology Rename 📋 READY
+## Phase F.0: Terminology Rename ✅ COMPLETE
 
-**Purpose:** Rename tools to noun forms before building new features  
-**Estimated Time:** 1 session  
-**Must Complete Before:** Phase F and Phase H (parallel)
+**Purpose:** Rename tools to noun forms before building new features
+**Completed:** January 28, 2026
 
-### What's Changing
+### What Changed
 
-| Current | New | Affects |
-|---------|-----|---------|
+| Old | New | Affects |
+|-----|-----|---------|
 | Impact | Impacts | Routes, nav, pages, components |
 | Improve | Insights | Routes, nav, pages, components |
 | Inspire | Inspirations | Routes, nav, pages, components |
 
 ### Checkpoints
-- [ ] CP1: Route updates (/impact → /impacts, /improve → /insights, /inspire → /inspirations)
-- [ ] CP2: Navigation labels in sidebar
-- [ ] CP3: Page component file renames
-- [ ] CP4: Import statement updates
-- [ ] CP5: Test all routes work
+- [x] CP1: File renames (10 page files renamed)
+- [x] CP2: pages/index.ts exports updated
+- [x] CP3: App.tsx routes + redirects
+- [x] CP4: Sidebar.tsx navigation labels
+- [x] CP5: Landing page content verified
+- [x] CP6: All routes tested and working
 
 ### Files to Update
 - `apps/together/src/App.tsx` (routes)
