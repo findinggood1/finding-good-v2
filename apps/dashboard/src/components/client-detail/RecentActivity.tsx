@@ -6,6 +6,8 @@ import {
   Activity,
   FileText,
   Zap,
+  TrendingUp,
+  Sparkles,
   MessageSquare,
   Mic,
   CheckCircle,
@@ -17,7 +19,7 @@ import { cn } from '@/lib/utils';
 
 interface ActivityItem {
   id: string;
-  type: 'snapshot' | 'impact' | 'session' | 'note' | 'memo' | 'assignment' | 'file';
+  type: 'snapshot' | 'impact' | 'improve' | 'inspire' | 'session' | 'note' | 'memo' | 'assignment' | 'file';
   description: string;
   date: string;
 }
@@ -29,11 +31,13 @@ interface RecentActivityProps {
 
 const activityConfig: Record<string, { icon: typeof Activity; color: string; label: string }> = {
   snapshot: { icon: Camera, color: 'text-blue-500', label: 'Snapshot' },
-  impact: { icon: Zap, color: 'text-purple-500', label: 'Impact' },
-  session: { icon: FileText, color: 'text-emerald-500', label: 'Session' },
-  note: { icon: MessageSquare, color: 'text-amber-500', label: 'Note' },
+  impact: { icon: Zap, color: 'text-primary', label: 'Impact' },
+  improve: { icon: TrendingUp, color: 'text-emerald-500', label: 'Improve' },
+  inspire: { icon: Sparkles, color: 'text-amber-500', label: 'Inspire' },
+  session: { icon: FileText, color: 'text-violet-500', label: 'Session' },
+  note: { icon: MessageSquare, color: 'text-sky-500', label: 'Note' },
   memo: { icon: Mic, color: 'text-rose-500', label: 'Voice Memo' },
-  assignment: { icon: CheckCircle, color: 'text-primary', label: 'Assignment' },
+  assignment: { icon: CheckCircle, color: 'text-teal-500', label: 'Assignment' },
   file: { icon: FileText, color: 'text-muted-foreground', label: 'File' },
 };
 

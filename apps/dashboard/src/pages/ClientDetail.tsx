@@ -3,19 +3,14 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useClientDetail } from '@/hooks/useClientDetail';
 import { supabase, ClientStatus } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, FileText, Calendar, MessageSquare, Map, ClipboardList, Zap, TrendingUp, Sparkles } from 'lucide-react';
+import { ArrowLeft, FileText, Calendar, MessageSquare, Map, Zap, TrendingUp, Sparkles } from 'lucide-react';
 import { ClientDetailHeader } from '@/components/client-detail/ClientDetailHeader';
 import { ClientSummaryCards } from '@/components/client-detail/ClientSummaryCards';
-import { StorySection } from '@/components/client-detail/StorySection';
 import { GoalsChallengesSection } from '@/components/client-detail/GoalsChallengesSection';
-import { FiresFocusSection } from '@/components/client-detail/FiresFocusSection';
 import { InfluenceSection } from '@/components/client-detail/InfluenceSection';
 import { QuickPrepSection } from '@/components/client-detail/QuickPrepSection';
-import { RecentActivity } from '@/components/client-detail/RecentActivity';
 import { ActivityFeed } from '@/components/client-detail/ActivityFeed';
-import { AssessmentsSection } from '@/components/client-detail/AssessmentsSection';
 import { PredictionsCard } from '@/components/client-detail/PredictionsCard';
 import { StartEngagementWizard } from '@/components/client-detail/StartEngagementWizard';
 import { DeleteClientModal } from '@/components/clients/DeleteClientModal';
@@ -24,23 +19,13 @@ import { ImpactTab } from '@/components/client-detail/tabs/ImpactTab';
 import { PrioritiesTab } from '@/components/client-detail/tabs/PrioritiesTab';
 import { NotesTab } from '@/components/client-detail/tabs/NotesTab';
 import { NarrativeMapTab } from '@/components/client-detail/tabs/NarrativeMapTab';
-import { AssignmentsTab } from '@/components/client-detail/tabs/AssignmentsTab';
-import { AddSessionModal } from '@/components/client-detail/tabs/AddSessionModal';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
-// Tab loading skeleton
-function TabSkeleton() {
-  return (
-    <div className="space-y-4">
-      <Skeleton className="h-8 w-48" />
-      <Skeleton className="h-32 w-full" />
-      <Skeleton className="h-32 w-full" />
-    </div>
-  );
-}
+// Tab type definition
+type TabValue = 'sessions' | 'notes' | 'inspire' | 'improve' | 'impact' | 'narrative-map' | null;
 
 export default function ClientDetail() {
   const { email } = useParams<{ email: string }>();
@@ -48,10 +33,9 @@ export default function ClientDetail() {
   const { toast } = useToast();
   const { coachData } = useAuth();
   const { client, engagement, snapshots, impactVerifications, sessions, assessments, notes, memos, assignments, nextScheduledSession, loading, updateEngagement, refetch } = useClientDetail(email);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState<TabValue>(null); // null = overview
   const [engagementWizardOpen, setEngagementWizardOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [addSessionModalOpen, setAddSessionModalOpen] = useState(false);
   const isMobile = useIsMobile();
 
   const latestSnapshot = snapshots[0] || null;
@@ -69,22 +53,9 @@ export default function ClientDetail() {
     return activities.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
   }, [snapshots, impactVerifications, sessions, notes]);
 
-  const recentActivities = useMemo(() => {
-    const all = [
-      ...snapshots.slice(0, 5).map((s) => ({ id: s.id, type: 'snapshot' as const, description: `Zone: ${s.overall_zone}`, date: s.created_at })),
-      ...sessions.slice(0, 5).map((s) => ({ id: s.id, type: 'session' as const, description: s.summary || `Session ${s.session_number}`, date: s.created_at })),
-      ...notes.slice(0, 5).map((n) => ({ id: n.id, type: 'note' as const, description: n.content.slice(0, 50) + '...', date: n.created_at })),
-    ];
-    return all.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
-  }, [snapshots, sessions, notes]);
-
-  const handleAction = (action: string) => {
-    toast({ title: `${action} coming soon`, description: 'This feature is under development.' });
-  };
-
   const handleStatusChange = async (status: ClientStatus) => {
     if (!client) return;
-    
+
     try {
       const updateData: Record<string, unknown> = { status };
       if (status === 'approved') {
@@ -98,15 +69,15 @@ export default function ClientDetail() {
         .eq('id', client.id);
 
       if (error) throw error;
-      
-      toast({ 
-        title: 'Status updated', 
-        description: `Client status changed to ${status}.` 
+
+      toast({
+        title: 'Status updated',
+        description: `Client status changed to ${status}.`
       });
       refetch();
     } catch (err) {
-      toast({ 
-        title: 'Error', 
+      toast({
+        title: 'Error',
         description: 'Failed to update client status.',
         variant: 'destructive'
       });
@@ -118,15 +89,25 @@ export default function ClientDetail() {
     navigate('/clients');
   };
 
+  const handleReturnToOverview = () => {
+    setActiveTab(null);
+  };
+
+  const handleNewBelief = () => {
+    window.open(
+      import.meta.env.DEV ? 'http://localhost:3001' : 'https://snapshot.findinggood.com',
+      '_blank'
+    );
+  };
+
+  // Tab configuration - no Overview tab, main view IS the overview
   const tabs = [
-    { value: 'overview', label: 'Overview', icon: FileText },
-    { value: 'sessions', label: 'Sessions', icon: Calendar },
-    { value: 'assignments', label: 'Assignments', icon: ClipboardList },
-    { value: 'inspire', label: 'Inspire', icon: Sparkles },
-    { value: 'improve', label: 'Improve', icon: TrendingUp },
-    { value: 'impact', label: 'Impact', icon: Zap },
-    { value: 'notes', label: 'Notes', icon: MessageSquare },
-    { value: 'narrative-map', label: 'Map', icon: Map },
+    { value: 'sessions' as const, label: 'Sessions', icon: Calendar },
+    { value: 'notes' as const, label: 'Notes', icon: MessageSquare },
+    { value: 'inspire' as const, label: 'Inspire', icon: Sparkles },
+    { value: 'improve' as const, label: 'Improve', icon: TrendingUp },
+    { value: 'impact' as const, label: 'Impact', icon: Zap },
+    { value: 'narrative-map' as const, label: 'Map', icon: Map },
   ];
 
   if (loading) {
@@ -170,6 +151,74 @@ export default function ClientDetail() {
     );
   }
 
+  // Render tab content based on active tab
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'sessions':
+        return (
+          <SessionsTab
+            sessions={sessions}
+            assignments={assignments}
+            clientEmail={client.email}
+            engagementId={engagement?.id}
+            onRefresh={refetch}
+          />
+        );
+      case 'notes':
+        return (
+          <NotesTab
+            notes={notes}
+            memos={memos}
+            sessions={sessions}
+            clientEmail={client.email}
+            onRefresh={refetch}
+          />
+        );
+      case 'inspire':
+        return (
+          <div className="space-y-6">
+            {/* Summary Cards at top of Inspire tab */}
+            <ClientSummaryCards
+              latestSnapshot={latestSnapshot}
+              lastActivity={lastActivity}
+              nextScheduledSession={nextScheduledSession}
+            />
+            <PredictionsCard clientEmail={client.email} />
+          </div>
+        );
+      case 'improve':
+        return <ImpactTab impacts={impactVerifications} />;
+      case 'impact':
+        return <PrioritiesTab impacts={impactVerifications} />;
+      case 'narrative-map':
+        return (
+          <NarrativeMapTab
+            engagement={engagement}
+            clientName={client.name}
+            clientEmail={client.email}
+            latestSnapshot={latestSnapshot}
+            refetch={refetch}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  // Render overview (main view when no tab is selected)
+  const renderOverview = () => (
+    <div className="space-y-6">
+      <InfluenceSection clientEmail={client.email} />
+      <QuickPrepSection
+        clientEmail={client.email}
+        sessions={sessions}
+        impactEntries={impactVerifications}
+      />
+      <GoalsChallengesSection engagement={engagement} onUpdate={updateEngagement} />
+      <ActivityFeed clientEmail={client.email} limit={10} />
+    </div>
+  );
+
   return (
     <div className="space-y-6 animate-fade-in">
       <Link to="/clients">
@@ -183,8 +232,8 @@ export default function ClientDetail() {
         client={client}
         engagement={engagement}
         latestSnapshot={latestSnapshot}
-        onAddNote={() => handleAction('Add Note')}
-        onAddSession={() => setAddSessionModalOpen(true)}
+        isOnTab={activeTab !== null}
+        onReturnToOverview={handleReturnToOverview}
         onStartEngagement={() => setEngagementWizardOpen(true)}
         onStatusChange={handleStatusChange}
         onDelete={() => setDeleteModalOpen(true)}
@@ -204,100 +253,42 @@ export default function ClientDetail() {
         onDeleted={handleDeleted}
       />
 
-      <AddSessionModal
-        open={addSessionModalOpen}
-        onOpenChange={setAddSessionModalOpen}
-        clientEmail={client.email}
-        engagementId={engagement?.id}
-        nextSessionNumber={(sessions.length || 0) + 1}
-        onSuccess={refetch}
-      />
+      {/* Combined Navigation Bar */}
+      <div className={cn(
+        "flex items-center gap-1 p-1 bg-muted/50 rounded-lg overflow-x-auto",
+        isMobile && "flex-nowrap"
+      )}>
+        {tabs.map((tab) => (
+          <Button
+            key={tab.value}
+            variant={activeTab === tab.value ? "secondary" : "ghost"}
+            size="sm"
+            onClick={() => setActiveTab(tab.value)}
+            className={cn(
+              "gap-1.5 flex-shrink-0",
+              activeTab === tab.value && "bg-background shadow-sm"
+            )}
+          >
+            <tab.icon className="h-4 w-4" />
+            <span className={cn(isMobile && "hidden sm:inline")}>{tab.label}</span>
+          </Button>
+        ))}
 
-      <ClientSummaryCards
-        latestSnapshot={latestSnapshot}
-        lastActivity={lastActivity}
-        nextScheduledSession={nextScheduledSession}
-      />
+        {/* New Belief Button - Primary Action */}
+        <Button
+          size="sm"
+          onClick={handleNewBelief}
+          className="ml-auto gap-1.5 flex-shrink-0"
+        >
+          <Sparkles className="h-4 w-4" />
+          <span className={cn(isMobile && "hidden sm:inline")}>New Belief</span>
+        </Button>
+      </div>
 
-      <InfluenceSection clientEmail={client.email} />
-
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className={cn(
-          "w-full",
-          isMobile && "flex-nowrap justify-start gap-1"
-        )}>
-          {tabs.map((tab) => (
-            <TabsTrigger 
-              key={tab.value} 
-              value={tab.value}
-              className={cn(
-                "gap-1.5",
-                isMobile && "flex-shrink-0 px-3"
-              )}
-            >
-              <tab.icon className="h-4 w-4" />
-              <span className={cn(isMobile && "hidden sm:inline")}>{tab.label}</span>
-            </TabsTrigger>
-          ))}
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6 mt-6">
-          <QuickPrepSection
-            clientEmail={client.email}
-            sessions={sessions}
-            impactEntries={impactVerifications}
-          />
-          <StorySection engagement={engagement} onUpdate={updateEngagement} onStartEngagement={() => setEngagementWizardOpen(true)} />
-          <GoalsChallengesSection engagement={engagement} onUpdate={updateEngagement} />
-          <FiresFocusSection engagement={engagement} latestSnapshot={latestSnapshot} onUpdate={updateEngagement} />
-          <AssessmentsSection
-            assessments={assessments}
-            clientEmail={client?.email || ''}
-            engagementId={engagement?.id}
-            onRefresh={refetch}
-          />
-          <RecentActivity activities={recentActivities} />
-          <ActivityFeed clientEmail={client?.email || ''} limit={5} />
-        </TabsContent>
-
-        <TabsContent value="inspire" className="mt-6">
-          <PredictionsCard clientEmail={client?.email || ''} />
-        </TabsContent>
-
-        <TabsContent value="sessions">
-          <SessionsTab
-            sessions={sessions}
-            clientEmail={client?.email || ''}
-            engagementId={engagement?.id}
-            onRefresh={refetch}
-          />
-        </TabsContent>
-        
-        <TabsContent value="assignments">
-          <AssignmentsTab
-            assignments={assignments}
-            clientEmail={client?.email || ''}
-            engagementId={engagement?.id}
-            onRefresh={refetch}
-          />
-        </TabsContent>
-
-        <TabsContent value="improve">
-          <ImpactTab impacts={impactVerifications} />
-        </TabsContent>
-
-        <TabsContent value="impact">
-          <PrioritiesTab impacts={impactVerifications} />
-        </TabsContent>
-
-        <TabsContent value="notes">
-          <NotesTab notes={notes} memos={memos} sessions={sessions} clientEmail={client?.email || ''} onRefresh={refetch} />
-        </TabsContent>
-        
-        <TabsContent value="narrative-map">
-          <NarrativeMapTab engagement={engagement} clientName={client?.name} clientEmail={client?.email || ''} latestSnapshot={latestSnapshot} refetch={refetch} />
-        </TabsContent>
-      </Tabs>
+      {/* Content Area */}
+      <div className="mt-6">
+        {activeTab === null ? renderOverview() : renderTabContent()}
+      </div>
     </div>
   );
 }

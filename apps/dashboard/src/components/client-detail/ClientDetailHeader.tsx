@@ -5,16 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ZoneBadge } from '@/components/clients/ZoneBadge';
 import { ClientStatusBadge } from '@/components/clients/ClientStatusBadge';
-import { Plus, FileText, Upload, Rocket, Trash2, ExternalLink, Sparkles } from 'lucide-react';
+import { Home, Rocket, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ClientDetailHeaderProps {
   client: Client;
   engagement: CoachingEngagement | null;
   latestSnapshot: Snapshot | null;
-  onAddNote: () => void;
-  onAddSession: () => void;
-  onUploadFile: () => void;
+  isOnTab: boolean;
+  onReturnToOverview: () => void;
   onStartEngagement: () => void;
   onStatusChange?: (status: ClientStatus) => Promise<void>;
   onDelete?: () => void;
@@ -36,9 +35,8 @@ export function ClientDetailHeader({
   client,
   engagement,
   latestSnapshot,
-  onAddNote,
-  onAddSession,
-  onUploadFile,
+  isOnTab,
+  onReturnToOverview,
   onStartEngagement,
   onStatusChange,
   onDelete,
@@ -59,13 +57,27 @@ export function ClientDetailHeader({
     }
   };
 
+  const handleNameClick = () => {
+    if (isOnTab) {
+      onReturnToOverview();
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Name and email */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="text-3xl font-serif font-semibold">
+            <h1
+              className={cn(
+                "text-3xl font-serif font-semibold flex items-center gap-2",
+                isOnTab && "cursor-pointer hover:text-primary transition-colors"
+              )}
+              onClick={handleNameClick}
+              title={isOnTab ? "Return to Overview" : undefined}
+            >
+              {isOnTab && <Home className="h-5 w-5 text-muted-foreground" />}
               {client.name || client.email}
             </h1>
             <ClientStatusBadge
@@ -82,7 +94,7 @@ export function ClientDetailHeader({
           )}
         </div>
 
-        {/* Badges */}
+        {/* Badges and minimal actions */}
         <div className="flex flex-wrap items-center gap-2">
           {engagement ? (
             <Badge
@@ -95,11 +107,23 @@ export function ClientDetailHeader({
               {getEngagementLabel()}
             </Badge>
           ) : (
-            <Badge variant="secondary" className="text-sm px-3 py-1">
-              No active engagement
-            </Badge>
+            <Button variant="secondary" size="sm" onClick={onStartEngagement}>
+              <Rocket className="h-4 w-4 mr-1" />
+              Start Engagement
+            </Button>
           )}
           <ZoneBadge zone={latestSnapshot?.overall_zone || null} />
+
+          {onDelete && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onDelete}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 
@@ -109,58 +133,6 @@ export function ClientDetailHeader({
           {client.notes}
         </p>
       )}
-
-      {/* Action Buttons */}
-      <div className="flex flex-wrap gap-2">
-        <Button variant="outline" size="sm" onClick={onAddNote}>
-          <Plus className="h-4 w-4 mr-1" />
-          Add Note
-        </Button>
-        <Button variant="outline" size="sm" onClick={onAddSession}>
-          <FileText className="h-4 w-4 mr-1" />
-          Add Session
-        </Button>
-        <Button variant="outline" size="sm" onClick={onUploadFile}>
-          <Upload className="h-4 w-4 mr-1" />
-          Upload File
-        </Button>
-        {!engagement && (
-          <Button variant="secondary" size="sm" onClick={onStartEngagement}>
-            <Rocket className="h-4 w-4 mr-1" />
-            Start Engagement
-          </Button>
-        )}
-
-        {/* V2 Integration Buttons */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => window.open(
-            `http://localhost:3003?email=${encodeURIComponent(client.email)}`,
-            '_blank'
-          )}
-        >
-          <ExternalLink className="h-4 w-4 mr-1" />
-          View as Client
-        </Button>
-        <Button
-          size="sm"
-          onClick={() => window.open(
-            import.meta.env.DEV ? 'http://localhost:3001' : 'https://snapshot.findinggood.com',
-            '_blank'
-          )}
-        >
-          <Sparkles className="h-4 w-4 mr-1" />
-          New Belief
-        </Button>
-
-        {onDelete && (
-          <Button variant="ghost" size="sm" onClick={onDelete} className="text-destructive hover:text-destructive hover:bg-destructive/10 ml-auto">
-            <Trash2 className="h-4 w-4 mr-1" />
-            Delete
-          </Button>
-        )}
-      </div>
     </div>
   );
 }

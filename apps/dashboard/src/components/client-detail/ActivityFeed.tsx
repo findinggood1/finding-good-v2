@@ -1,7 +1,7 @@
 import { formatDistanceToNow } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Activity, Loader2, ExternalLink } from 'lucide-react';
+import { Activity, Loader2, ExternalLink, Zap, Sparkles } from 'lucide-react';
 import { useClientActivity } from '@/hooks/useClientActivity';
 import { cn } from '@/lib/utils';
 
@@ -105,13 +105,43 @@ function ActivityItem({ activity }: ActivityItemProps) {
   // Extract FIRES elements from the fires_extracted field
   const firesElements = extractFiresElements(activity.fires_extracted);
 
+  // Determine if this is linked to a belief (prediction)
+  const isLinkedToBelief = !!activity.prediction_id;
+
   return (
     <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+      {/* Icon */}
+      <div className={cn(
+        'mt-0.5 p-1.5 rounded-full',
+        isLinkedToBelief ? 'bg-amber-500/10 text-amber-600' : 'bg-primary/10 text-primary'
+      )}>
+        {isLinkedToBelief ? (
+          <Sparkles className="h-4 w-4" />
+        ) : (
+          <Zap className="h-4 w-4" />
+        )}
+      </div>
+
       <div className="flex-1 min-w-0">
+        {/* Type badge */}
+        <div className="flex items-center gap-2 mb-1">
+          <span className={cn(
+            'text-xs font-medium uppercase',
+            isLinkedToBelief ? 'text-amber-600' : 'text-primary'
+          )}>
+            {isLinkedToBelief ? 'Inspire' : 'Impact'}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}
+          </span>
+        </div>
+
+        {/* Content */}
         <p className="text-sm">
-          {activity.proof_line || 'Impact entry recorded'}
+          {activity.proof_line || 'Entry recorded'}
         </p>
 
+        {/* FIRES badges */}
         {firesElements.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {firesElements.map((element) => {
@@ -132,17 +162,13 @@ function ActivityItem({ activity }: ActivityItemProps) {
           </div>
         )}
 
-        <div className="flex items-center gap-2 mt-2">
-          <span className="text-xs text-muted-foreground">
-            {formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}
-          </span>
-          {activity.prediction_id && (
-            <span className="inline-flex items-center text-xs text-primary gap-0.5">
-              <ExternalLink className="h-3 w-3" />
-              Linked to prediction
-            </span>
-          )}
-        </div>
+        {/* Linked to belief indicator */}
+        {isLinkedToBelief && (
+          <div className="flex items-center gap-1 mt-2">
+            <ExternalLink className="h-3 w-3 text-amber-600" />
+            <span className="text-xs text-amber-600">Linked to belief</span>
+          </div>
+        )}
       </div>
     </div>
   );
