@@ -6,40 +6,62 @@
 
 ## Status
 
-**Current Phase:** Phase B — Home/Influence Page  
-**Previous Phase:** Phase A — Navigation Restructure ✅ Complete  
+**Current Phase:** Phase C — Tool Landing Pages, Renames, & Inspire Others  
+**Previous Phase:** Phase B — Home/Influence Page ✅ Complete  
 **Blocking Issues:** None
 
 ---
 
-## Phase A Summary (Complete)
+## Phase B Summary (Complete)
 
-Navigation restructured to Four I's framework:
-- NavDropdown component created
-- Sidebar updated: PRIMARY → TOOLS → DIRECTION → UTILITY
-- Placeholder pages for Impact/Improve/Inspire
-- Routes wired up with redirects from old paths
-- Commit: `d1fd7d2`
+Home page restructured with Four I's action-oriented design:
+- YOUR INFLUENCE section (Permission, Practice, Focus with inline edit)
+- WHAT YOU'RE CREATING section (Predictions/beliefs)
+- TODAY'S CHECK-IN (Focus item checkboxes, engagement, reflection)
+- THIS WEEK section (Active beliefs + evidence counts)
+- RECENT ACTIVITY (Sent/Received entries)
+- INSIGHTS section (Rule-based contextual messages)
+- FEED section (Bottom of page)
 
-See: `docs/handoffs/phase_a_complete.md`
+Map page now contains analytics:
+- PredictabilityCard
+- FIRES Grid
+- Trajectory Chart
+- Activity Counts
+- Yours vs Others comparison
+
+Database: `daily_reflections` table created with RLS policies.
 
 ---
 
-## Phase B Overview (Next)
+## Phase C Overview (Next)
 
-Build the unified Home page:
-1. Influence section (permission, practice, focus)
-2. Daily check-in with focus item checkboxes
-3. This Week section (beliefs + evidence)
-4. Recent Activity (sent/received)
-5. Simple Insights
-6. Assemble HomePage
+Build landing pages for the three I's and complete the Inspire Others flow:
 
-**Pre-reqs:**
-- [ ] Verify `daily_reflections` table exists (or create it)
-- [ ] Check `permissions` table structure
+1. **Checkpoint 1:** Reusable ToolLandingPage component
+2. **Checkpoint 2:** Impact landing page with content
+3. **Checkpoint 3:** Improve landing page with content  
+4. **Checkpoint 4:** Inspire landing page with content
+5. **Checkpoint 5:** Update Self pages with new branding
+6. **Checkpoint 6:** Update Others pages with new branding
+7. **Checkpoint 7:** BUILD Inspire Others flow (NEW — does not exist yet)
 
-**Build plan:** `docs/phase_b_build_plan.md`
+**Key Note:** Impact Others (RecognizePage) and Improve Others (OtherMode) already exist. 
+Only Inspire Others needs to be built from scratch.
+
+**Build plan:** `docs/phase_c_build_plan.md`
+
+---
+
+## Remaining Phases
+
+| Phase | Content | Est. Sessions |
+|-------|---------|---------------|
+| **C** (Current) | Tool Landing Pages + Inspire Others | 1-2 |
+| **D** | Exchange (partnerships) | 1-2 |
+| **E** | Dashboard (Coach view) | 1-2 |
+
+**Total remaining:** ~4-6 sessions
 
 ---
 
@@ -47,32 +69,33 @@ Build the unified Home page:
 
 | Doc | Purpose |
 |-----|---------|
-| `docs/phase_b_build_plan.md` | Current phase instructions |
+| `docs/phase_c_build_plan.md` | Current phase instructions |
 | `docs/COLLABORATION_PROTOCOL.md` | How Desktop + Code Claude work together |
 | `docs/naming_concordance.md` | Old → new name mappings |
-| `docs/handoffs/phase_a_complete.md` | What was just built |
+| `docs/handoffs/phase_b_complete.md` | What was just built |
 
 ---
 
-## Starting Phase B Prompt
+## Starting Phase C Prompt
 
 ```
-Starting Phase B: Home/Influence Page build.
+Starting Phase C: Tool Landing Pages, Renames, & Inspire Others.
 
 Read these files first:
-- docs/phase_b_build_plan.md (primary guide)
+- docs/phase_c_build_plan.md (primary guide)
 - docs/COLLABORATION_PROTOCOL.md (how we work)
-- docs/handoffs/phase_a_complete.md (context)
 - docs/naming_concordance.md (label mappings)
 
 Pre-flight checklist:
 1. Verify Together app runs at localhost:3005
 2. Check TypeScript compiles: pnpm tsc --noEmit
 3. Check git status for uncommitted changes
-4. Via Supabase MCP: Check if daily_reflections table exists
-5. Via Supabase MCP: Check permissions table structure
+4. Review existing Others pages:
+   - apps/priority/src/pages/RecognizePage.tsx (Impact Others - EXISTS)
+   - apps/prove/src/pages/OtherMode.tsx (Improve Others - EXISTS)
+   - apps/predict/src/pages/ (Inspire Others - DOES NOT EXIST)
 
-Then start Checkpoint 1: Your Influence Section
+Then start Checkpoint 1: Reusable ToolLandingPage Component
 
 STOP after each checkpoint for validation.
 ```

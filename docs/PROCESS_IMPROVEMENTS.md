@@ -24,9 +24,11 @@
 
 | Improvement | Priority | Effort | Payoff | Notes |
 |-------------|----------|--------|--------|-------|
-| Test data seeding script | High | Medium | High | SQL script to populate dev DB with personas |
+| Dev database clone | High | Medium | High | Separate Supabase project for dev/testing — do after Phase B/C stable |
+| Test data seeding script | High | Medium | High | SQL script to populate dev DB with personas (needs dev DB first) |
 | Component inventory doc | Medium | Low | Medium | Document what exists in @finding-good/shared |
 | Pre-flight automation | Low | Medium | Medium | Script that runs all checks before build |
+| HomePage visual design pass | Medium | High | High | Make Home page emotionally engaging — colors, celebration states, reduce whitespace |
 
 ---
 
@@ -42,6 +44,7 @@
 | E2E tests for critical paths | Tests | Playwright? Cypress? Which paths? |
 | Database migration versioning | Process | Do we need more than what we have? |
 | AI-assisted code review | Process | Can Desktop Claude review PRs? |
+| Vercel MCP integration | Tool | Pause/resume deploys during builds? Worth setup vs manual pause or feature branches? |
 
 ---
 

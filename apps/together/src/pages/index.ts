@@ -33,6 +33,7 @@ export { ImproveOthersPage } from './ImproveOthersPage'
 export { InspireLandingPage } from './InspireLandingPage'
 export { InspireSelfPage } from './InspireSelfPage'
 export { InspireOthersPage } from './InspireOthersPage'
+export { InspireRecipientView } from './InspireRecipientView'
 
 // New: Exchange / Partnership
 export { PartnershipViewPage } from './PartnershipViewPage'

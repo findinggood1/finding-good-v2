@@ -24,6 +24,7 @@ import {
   InspireLandingPage,
   InspireSelfPage,
   InspireOthersPage,
+  InspireRecipientView,
   PartnershipViewPage,
 } from './pages'
 import {
@@ -42,6 +43,7 @@ function App() {
         {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Route path="/inspire/view/:shareId" element={<InspireRecipientView />} />
 
         {/* Home (Influence) */}
         <Route

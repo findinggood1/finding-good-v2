@@ -5,12 +5,14 @@ import { supabase, ClientStatus } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, FileText, Calendar, MessageSquare, Map, ClipboardList, Crosshair, Star, CheckCircle } from 'lucide-react';
+import { ArrowLeft, FileText, Calendar, MessageSquare, Map, ClipboardList, Zap, TrendingUp, Sparkles } from 'lucide-react';
 import { ClientDetailHeader } from '@/components/client-detail/ClientDetailHeader';
 import { ClientSummaryCards } from '@/components/client-detail/ClientSummaryCards';
 import { StorySection } from '@/components/client-detail/StorySection';
 import { GoalsChallengesSection } from '@/components/client-detail/GoalsChallengesSection';
 import { FiresFocusSection } from '@/components/client-detail/FiresFocusSection';
+import { InfluenceSection } from '@/components/client-detail/InfluenceSection';
+import { QuickPrepSection } from '@/components/client-detail/QuickPrepSection';
 import { RecentActivity } from '@/components/client-detail/RecentActivity';
 import { ActivityFeed } from '@/components/client-detail/ActivityFeed';
 import { AssessmentsSection } from '@/components/client-detail/AssessmentsSection';
@@ -120,9 +122,9 @@ export default function ClientDetail() {
     { value: 'overview', label: 'Overview', icon: FileText },
     { value: 'sessions', label: 'Sessions', icon: Calendar },
     { value: 'assignments', label: 'Assignments', icon: ClipboardList },
-    { value: 'predictions', label: 'Predictions', icon: Crosshair },
-    { value: 'proof', label: 'Proof', icon: CheckCircle },
-    { value: 'priorities', label: 'Priorities', icon: Star },
+    { value: 'inspire', label: 'Inspire', icon: Sparkles },
+    { value: 'improve', label: 'Improve', icon: TrendingUp },
+    { value: 'impact', label: 'Impact', icon: Zap },
     { value: 'notes', label: 'Notes', icon: MessageSquare },
     { value: 'narrative-map', label: 'Map', icon: Map },
   ];
@@ -211,11 +213,13 @@ export default function ClientDetail() {
         onSuccess={refetch}
       />
 
-      <ClientSummaryCards 
-        latestSnapshot={latestSnapshot} 
-        lastActivity={lastActivity} 
+      <ClientSummaryCards
+        latestSnapshot={latestSnapshot}
+        lastActivity={lastActivity}
         nextScheduledSession={nextScheduledSession}
       />
+
+      <InfluenceSection clientEmail={client.email} />
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className={cn(
@@ -238,6 +242,11 @@ export default function ClientDetail() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6 mt-6">
+          <QuickPrepSection
+            clientEmail={client.email}
+            sessions={sessions}
+            impactEntries={impactVerifications}
+          />
           <StorySection engagement={engagement} onUpdate={updateEngagement} onStartEngagement={() => setEngagementWizardOpen(true)} />
           <GoalsChallengesSection engagement={engagement} onUpdate={updateEngagement} />
           <FiresFocusSection engagement={engagement} latestSnapshot={latestSnapshot} onUpdate={updateEngagement} />
@@ -251,7 +260,7 @@ export default function ClientDetail() {
           <ActivityFeed clientEmail={client?.email || ''} limit={5} />
         </TabsContent>
 
-        <TabsContent value="predictions" className="mt-6">
+        <TabsContent value="inspire" className="mt-6">
           <PredictionsCard clientEmail={client?.email || ''} />
         </TabsContent>
 
@@ -273,11 +282,11 @@ export default function ClientDetail() {
           />
         </TabsContent>
 
-        <TabsContent value="proof">
+        <TabsContent value="improve">
           <ImpactTab impacts={impactVerifications} />
         </TabsContent>
 
-        <TabsContent value="priorities">
+        <TabsContent value="impact">
           <PrioritiesTab impacts={impactVerifications} />
         </TabsContent>
 

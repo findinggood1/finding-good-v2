@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm tsc:*)",
+      "Bash(pnpm build:*)",
+      "Bash(npx supabase:*)",
+      "Bash(curl:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nfeat: Foundation build complete - types, components, constants\n\nTypes:\n- Added 10 type aliases \\(CoachingRelationshipStatus, ActivityStatus, etc.\\)\n- Added 19 interfaces \\(Permission, DailyCheckin, CampfireItem, etc.\\)\n- Added 2 helper functions \\(calculateClientStatus, getBridgeQuestion\\)\n- Updated Prediction interface with V4 columns\n\nComponents:\n- FiresBadge - FIRES element display with colors\n- EngagementIndicator - 1-5 scale with interactive mode\n- CampfireCard - Feed item display\n- CircleStatusRow - Circle member status\n- RecognizeButton - Recognition action\n- BridgeQuestionCard - Coaching question display\n\nConstants:\n- FIRES_ELEMENTS array\n- FIRES_DISPLAY with color, label, initial, description\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(tree:*)",
+      "Bash(git commit:*)",
+      "Bash(npx tsc:*)",
+      "Bash(timeout 15 pnpm dev:*)",
+      "Bash(timeout 12 pnpm dev:*)",
+      "Bash(pnpm:*)",
+      "Bash(git config:*)",
+      "Bash(python3:*)",
+      "Bash(node -e:*)",
+      "Bash(for m in 20240111_priority_asks 20240112_add_requester_email 20240112_priority_asks_requester_name 20240112_priority_responses_analysis 20240112_recognitions 20260111_social_features 20260117_exchange_impacts 20260117_predictions_question 20260117_recognized_entries 20260126_predictions_rls 20260126_v4_dashboard_together)",
+      "Bash(do npx supabase migration repair --status applied \"$m\")",
+      "Bash(done)",
+      "Bash(ls:*)",
+      "Bash(npx:*)",
+      "Bash(for v in 20240112 20260111 20260117 20260126)",
+      "Bash(do echo \"Repairing $v...\")",
+      "WebSearch",
+      "Bash(supabase db push:*)",
+      "Bash(supabase db execute:*)",
+      "Bash(supabase --version:*)",
+      "mcp__supabase__execute_sql",
+      "Bash(git push:*)",
+      "mcp__supabase__list_tables",
+      "mcp__supabase__apply_migration"
+    ]
+  }
+}

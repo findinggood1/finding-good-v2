@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  Activity, 
-  FileText, 
-  Target, 
-  MessageSquare, 
-  Mic, 
+import {
+  Activity,
+  FileText,
+  Zap,
+  MessageSquare,
+  Mic,
   CheckCircle,
   Camera,
   ChevronDown,
@@ -29,7 +29,7 @@ interface RecentActivityProps {
 
 const activityConfig: Record<string, { icon: typeof Activity; color: string; label: string }> = {
   snapshot: { icon: Camera, color: 'text-blue-500', label: 'Snapshot' },
-  impact: { icon: Target, color: 'text-purple-500', label: 'Impact Entry' },
+  impact: { icon: Zap, color: 'text-purple-500', label: 'Impact' },
   session: { icon: FileText, color: 'text-emerald-500', label: 'Session' },
   note: { icon: MessageSquare, color: 'text-amber-500', label: 'Note' },
   memo: { icon: Mic, color: 'text-rose-500', label: 'Voice Memo' },

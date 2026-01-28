@@ -22,7 +22,7 @@ import {
   ChevronRight,
   Camera,
   Target,
-  Crosshair,
+  Sparkles,
   Play,
   CheckCircle,
   ClipboardList,
@@ -159,9 +159,9 @@ export default function Dashboard() {
         <Card className="shadow-soft">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Active Predictions
+              Active Beliefs
             </CardTitle>
-            <Crosshair className="h-4 w-4 text-primary" />
+            <Sparkles className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.activePredictions}</div>

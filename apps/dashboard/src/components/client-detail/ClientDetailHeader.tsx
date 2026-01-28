@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ZoneBadge } from '@/components/clients/ZoneBadge';
 import { ClientStatusBadge } from '@/components/clients/ClientStatusBadge';
-import { Plus, FileText, Upload, Rocket, Trash2, ExternalLink, Crosshair } from 'lucide-react';
+import { Plus, FileText, Upload, Rocket, Trash2, ExternalLink, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ClientDetailHeaderProps {
@@ -150,8 +150,8 @@ export function ClientDetailHeader({
             '_blank'
           )}
         >
-          <Crosshair className="h-4 w-4 mr-1" />
-          New Prediction
+          <Sparkles className="h-4 w-4 mr-1" />
+          New Belief
         </Button>
 
         {onDelete && (

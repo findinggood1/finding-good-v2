@@ -1,3 +1,11 @@
-// TODO: Build dedicated Improve Others page (was Witness)
-// For now, re-exports ProofPage
-export { ProofPage as ImproveOthersPage } from './ProofPage'
+import { ProofPage } from './ProofPage'
+
+export function ImproveOthersPage() {
+  return (
+    <ProofPage
+      pageTitle="Witness Someone's Growth"
+      toolName="Improvement"
+      mode="send"
+    />
+  )
+}

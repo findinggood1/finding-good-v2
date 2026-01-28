@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { ImpactVerification } from '@/hooks/useClientDetail';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Target, ChevronDown, ChevronUp, Quote } from 'lucide-react';
+import { TrendingUp, ChevronDown, ChevronUp, Quote } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface ImpactTabProps {
@@ -75,9 +75,9 @@ export function ImpactTab({ impacts }: ImpactTabProps) {
   if (impacts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-        <Target className="h-12 w-12 mb-4 opacity-50" />
-        <p className="text-lg font-medium">No impact entries yet</p>
-        <p className="text-sm mt-1">Impact verifications will appear here</p>
+        <TrendingUp className="h-12 w-12 mb-4 opacity-50" />
+        <p className="text-lg font-medium">No improvement entries yet</p>
+        <p className="text-sm mt-1">Improvement validations will appear here</p>
       </div>
     );
   }

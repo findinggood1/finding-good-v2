@@ -1,8 +1,8 @@
 # Finding Good V2: Ecosystem Map
 
-**Version:** 1.0  
+**Version:** 1.1  
 **Created:** January 10, 2026  
-**Last Updated:** January 10, 2026  
+**Last Updated:** January 18, 2026  
 **Purpose:** Reference document for V2 build — shows how all tools connect and what would break if changed
 
 ---
@@ -149,40 +149,53 @@
 
 ---
 
-### 1.4 Together (Dashboard)
+### 1.4 Together (Dashboard/Exchange Hub)
 
 | Attribute | Value |
 |-----------|-------|
 | **Old Name** | Coach Dashboard |
-| **Primary Function** | Synthesize all activity, show progress, enable coaching |
-| **Who Uses It** | Coaches (primary), Users (their own view), Free users (limited) |
-| **URL** | dashboard.findinggood.com (V1 in Lovable) |
+| **Primary Function** | Exchange hub — see how your clarity work impacts others |
+| **Who Uses It** | All users (primary view of their growth journey) |
+| **URL** | localhost:3005 (dev), together.findinggood.com (prod) |
+| **Status** | ✅ P0 + P1 BUILT (January 17, 2026) |
 
-**What It Displays:**
+**4-Page Structure (Built):**
 
-| Section | Data Source | Who Sees |
-|---------|-------------|----------|
-| My Predictions | `predictions` | All users |
-| Prediction Activity | `priorities`, `validations` linked by `prediction_id` | All users |
-| FIRES Signals | AI extraction from recent activity | All users |
-| Connections | `prediction_connections`, share activity | All users |
-| Integrity Map | Weekly synthesis PDF | All users |
-| More/Less Markers | `more_less_markers` | Coached clients |
-| Coaching Notes | `coaching_notes` | Coach view |
-| Session Transcripts | `session_transcripts` | Coach view |
+| Page | URL | Features |
+|------|-----|----------|
+| **Home** | `/` | Predictability score, FIRES grid with zones, activity counts, this week's evidence, noticing in others |
+| **Exchange** | `/exchange` | Growth edge card, exchange impact tracking, active asks |
+| **Campfire** | `/campfire` | Circle feed (empty state), pending asks section |
+| **Map** | `/map` | Activity counts (all-time), yours vs others comparison, trajectory chart |
+
+**Hooks Built:**
+
+| Hook | Purpose |
+|------|---------|
+| `useActivityCounts` | Priority/Proof/Snapshot counts |
+| `useExchangeImpacts` | Impact tracking data |
+| `useYoursVsOthers` | FIRES comparison with circle |
+| `useTrajectory` | Score history over time |
+| `usePendingAsks` | Outstanding asks |
+| `useThisWeeksEvidence` | Recent activity |
+| `useNoticingInOthers` | Circle activity feed |
+
+**Components Built:**
+PredictabilityCard, FiresGrid, FeedCard, GrowthEdgeCard, TrajectoryChart, YoursVsOthersChart, and 10+ more
 
 ---
 
-### 1.5 Campfire (Inspiration Feed)
+### 1.5 Campfire (Circle Feed)
 
 | Attribute | Value |
 |-----------|-------|
 | **New in V2** | Yes |
 | **Primary Function** | Social layer — see what connections share, get inspired |
 | **Who Uses It** | All users with mutual connections |
-| **Location** | Within Together dashboard |
+| **Location** | `/campfire` page within Together app |
+| **Status** | ✅ UI BUILT, awaiting feed data from Priority/Proof share toggles |
 
-**What It Contains:**
+**What It Contains (When Populated):**
 
 | Content Type | Source | Visibility |
 |--------------|--------|------------|
@@ -190,13 +203,17 @@
 | Proofs | `validations` where `share_to_feed = true` | Mutual connections |
 | Predictions | `predictions` where shared | Mutual connections |
 
-**Phased Rollout:**
+**Actions Built:**
 
-| Phase | Features |
-|-------|----------|
-| v2.0 | View-only — see shares, no interaction |
-| v2.0.5 | Add reactions (👍 💡 🔥 ❤️ 🙌) |
-| v2.1 | Add comments + "open to discovery" toggle |
+| Action | Function | Table |
+|--------|----------|-------|
+| Recognize | Mark entry as "seen/valued" | `recognized_entries` |
+| Record Impact | Rate as helpful/meaningful/high_impact | `exchange_impacts` |
+
+**Still Needed (Separate Builds):**
+- Priority app: share_to_feed toggle at completion
+- Proof app: share_to_feed toggle at completion
+- Both: FIRES visible on entries, question prompts
 
 ---
 
@@ -527,17 +544,24 @@ more_less_markers
 └── more_less_updates.exchange_marker_id → more_less_markers.id
 ```
 
-### 5.3 New Tables Needed (V2)
+### 5.3 New Tables (V2)
 
-| Table | Purpose | Key Columns |
-|-------|---------|-------------|
-| `predictions` (V2) | Goals/challenges being tracked | `client_email`, `title`, `status`, `rank`, `predictability_score` |
-| `prediction_connections` | People linked to predictions | `prediction_id`, `name`, `email`, `working_on_similar` |
-| `quick_predictions` | Workshop quick captures | `client_email`, `goal_text`, `ai_clarity` |
-| `inspiration_shares` | Campfire feed content | `client_email`, `content_type`, `content_id`, `share_text` |
-| `share_visibility` | Mutual connections | `user_a_email`, `user_b_email` |
-| `reactions` (v2.0.5) | Feed reactions | `share_id`, `reactor_email`, `reaction_type` |
-| `comments` (v2.1) | Feed comments | `share_id`, `commenter_email`, `comment_text` |
+| Table | Purpose | Status |
+|-------|---------|--------|
+| `predictions` (V2) | Goals/challenges being tracked | ✅ Built |
+| `prediction_connections` | People linked to predictions | ✅ Built |
+| `priority_asks` | Ask invitations with tokens | ✅ Built |
+| `priority_responses` | Responses to asks | ✅ Built |
+| `exchange_impacts` | Impact level tracking (helpful/meaningful/high_impact) | ✅ Built (Jan 17) |
+| `recognized_entries` | Recognition records | ✅ Built (Jan 17) |
+| `quick_predictions` | Workshop quick captures | Not yet built |
+| `inspiration_shares` | Campfire feed content | Not yet built |
+| `share_visibility` | Mutual connections | Not yet built |
+| `reactions` (v2.0.5) | Feed reactions | Not yet built |
+| `comments` (v2.1) | Feed comments | Not yet built |
+
+**New Columns Added:**
+- `predictions.question` — User's core question for the prediction
 
 ### 5.4 Columns Shared Across Tools
 
@@ -691,11 +715,12 @@ These should be consistent across tools:
 
 | Section | Status | Last Verified |
 |---------|--------|---------------|
-| Tool Purposes | ✅ Complete | Jan 10, 2026 |
+| Tool Purposes | ✅ Complete | Jan 18, 2026 |
 | Data Flows | ✅ Complete | Jan 10, 2026 |
 | Shared Concepts | ✅ Complete | Jan 10, 2026 |
 | Breaking Changes | ✅ Complete | Jan 10, 2026 |
-| Supabase Schema | ✅ Verified via query | Jan 10, 2026 |
+| Supabase Schema | ✅ Updated | Jan 18, 2026 |
+| Together App | ✅ P0+P1 Built | Jan 17, 2026 |
 
 ---
 
@@ -706,3 +731,4 @@ These should be consistent across tools:
 - *Changing shared concepts (FIRES, predictions)*
 - *Modifying authentication patterns*
 - *Running migration phases*
+- *Completing app builds*

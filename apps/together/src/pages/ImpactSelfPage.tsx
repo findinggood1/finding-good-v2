@@ -1,2 +1,5 @@
-// TODO: Rename from Priority to Impact
-export { PriorityPage as ImpactSelfPage } from './PriorityPage'
+import { PriorityPage } from './PriorityPage'
+
+export function ImpactSelfPage() {
+  return <PriorityPage pageTitle="Record Your Impact" toolName="Impact" />
+}

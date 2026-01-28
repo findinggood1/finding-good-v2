@@ -1,36 +1,36 @@
-import { Link } from 'react-router-dom'
-import { Card } from '@finding-good/shared'
+import { ToolLandingPage } from '../components/tools'
+import { useRecentToolEntries } from '../hooks/useRecentToolEntries'
+
+const impactConfig = {
+  title: 'IMPACT',
+  tagline: 'What went well? Where did you or others make a difference?',
+  description:
+    'Impact is about recognizing the positive difference being made — by you and by others. When you notice impact, you strengthen your ability to create more of it.',
+  icon: '⚡',
+  color: '#1B5666', // Deep Teal
+  selfMode: {
+    title: 'For Yourself',
+    description:
+      'Record the impact you had today. Reflect on what went well and what you contributed.',
+    route: '/impact/self',
+    buttonText: 'Record My Impact',
+  },
+  othersMode: {
+    title: 'For Others',
+    description:
+      'Recognize the impact someone had on you. Send acknowledgment to someone who made a difference.',
+    route: '/impact/others',
+    buttonText: 'Recognize Someone',
+  },
+}
 
 export function ImpactLandingPage() {
-  return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-brand-primary mb-2">IMPACT</h1>
-      <p className="text-lg text-gray-600 mb-2">
-        What went well? Where did you or others make a difference?
-      </p>
-      <p className="text-gray-500 mb-8">
-        Impact is about recognizing the positive difference being made — by you and by others.
-        When you notice impact, you strengthen your ability to create more of it.
-      </p>
+  const { entries, isLoading } = useRecentToolEntries('impact')
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Link to="/impact/self" className="block">
-          <Card className="p-6 hover:shadow-md transition-shadow h-full">
-            <h2 className="text-lg font-semibold mb-2">For Yourself</h2>
-            <p className="text-sm text-gray-600">
-              Record the impact you had today
-            </p>
-          </Card>
-        </Link>
-        <Link to="/impact/others" className="block">
-          <Card className="p-6 hover:shadow-md transition-shadow h-full">
-            <h2 className="text-lg font-semibold mb-2">For Others</h2>
-            <p className="text-sm text-gray-600">
-              Recognize impact someone had on you
-            </p>
-          </Card>
-        </Link>
-      </div>
-    </div>
+  return (
+    <ToolLandingPage
+      {...impactConfig}
+      recentEntries={isLoading ? [] : entries}
+    />
   )
 }

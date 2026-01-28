@@ -11,3 +11,6 @@ export { Sidebar } from './layout'
 
 // Auth components
 export { RoleGate, LockedFeature } from './auth'
+
+// Tool landing page components
+export { ToolLandingPage } from './tools'

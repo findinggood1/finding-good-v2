@@ -1,2 +1,5 @@
-// TODO: Rename from Proof to Improve
-export { ProofPage as ImproveSelfPage } from './ProofPage'
+import { ProofPage } from './ProofPage'
+
+export function ImproveSelfPage() {
+  return <ProofPage pageTitle="Validate Your Improvement" toolName="Improvement" />
+}

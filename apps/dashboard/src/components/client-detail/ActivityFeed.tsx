@@ -109,7 +109,7 @@ function ActivityItem({ activity }: ActivityItemProps) {
     <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
       <div className="flex-1 min-w-0">
         <p className="text-sm">
-          {activity.proof_line || 'Priority/proof added'}
+          {activity.proof_line || 'Impact entry recorded'}
         </p>
 
         {firesElements.length > 0 && (

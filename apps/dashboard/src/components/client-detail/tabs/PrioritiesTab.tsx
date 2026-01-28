@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { ImpactVerification } from '@/hooks/useClientDetail';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Star, ChevronDown, ChevronUp, Quote } from 'lucide-react';
+import { Zap, ChevronDown, ChevronUp, Quote } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface PrioritiesTabProps {
@@ -54,9 +54,9 @@ export function PrioritiesTab({ impacts }: PrioritiesTabProps) {
   if (priorities.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-        <Star className="h-12 w-12 mb-4 opacity-50" />
-        <p className="text-lg font-medium">No priorities yet</p>
-        <p className="text-sm mt-1">Self-reported priorities will appear here</p>
+        <Zap className="h-12 w-12 mb-4 opacity-50" />
+        <p className="text-lg font-medium">No impact entries yet</p>
+        <p className="text-sm mt-1">Self-reported impact entries will appear here</p>
       </div>
     );
   }
@@ -64,7 +64,7 @@ export function PrioritiesTab({ impacts }: PrioritiesTabProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-sm text-muted-foreground">{priorities.length} {priorities.length === 1 ? 'priority' : 'priorities'}</p>
+        <p className="text-sm text-muted-foreground">{priorities.length} impact {priorities.length === 1 ? 'entry' : 'entries'}</p>
       </div>
       {priorities.map((priority) => {
         const isExpanded = expandedIds.has(priority.id);

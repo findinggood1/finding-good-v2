@@ -33,3 +33,6 @@ export { useRecentActivity, type ActivityEntry } from './useRecentActivity'
 
 // Role Hooks
 export { useUserRole, type UserRole } from './useUserRole'
+
+// Tool Landing Page Hooks
+export { useRecentToolEntries } from './useRecentToolEntries'

@@ -1,3 +1,11 @@
-// TODO: Build dedicated Impact Others page (was Recognize)
-// For now, re-exports PriorityPage
-export { PriorityPage as ImpactOthersPage } from './PriorityPage'
+import { PriorityPage } from './PriorityPage'
+
+export function ImpactOthersPage() {
+  return (
+    <PriorityPage
+      pageTitle="Recognize Someone's Impact"
+      toolName="Impact"
+      mode="send"
+    />
+  )
+}

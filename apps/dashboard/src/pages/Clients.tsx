@@ -25,6 +25,7 @@ import {
 import { Search, Plus, Users, ChevronRight, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { ZoneBadge } from '@/components/clients/ZoneBadge';
 import { ClientStatusBadge } from '@/components/clients/ClientStatusBadge';
+import { EngagementBadge } from '@/components/clients/EngagementBadge';
 import { AddClientModal } from '@/components/clients/AddClientModal';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -241,19 +242,17 @@ export default function Clients() {
       </div>
       
       <div className="mt-3 flex flex-wrap items-center gap-2">
+        <EngagementBadge lastActivity={client.last_activity} />
         <ZoneBadge zone={client.overall_zone} />
-        <span className={cn(
-          "text-xs px-2 py-0.5 rounded-full",
-          client.engagement_status === 'active' 
-            ? 'bg-primary/10 text-primary' 
-            : 'bg-muted text-muted-foreground'
-        )}>
-          {client.engagement_status === 'active' ? 'Active' : 'No Engagement'}
-        </span>
+        {client.engagement_status === 'active' && (
+          <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+            Week {client.engagement_week || 1}
+          </span>
+        )}
       </div>
-      
+
       <p className="text-xs text-muted-foreground mt-2">
-        Last activity: {formatLastActivity(client.last_activity)}
+        Last: {formatLastActivity(client.last_activity)}
       </p>
     </div>
   );
@@ -458,7 +457,8 @@ export default function Clients() {
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Last Activity</TableHead>
+                    <TableHead>Activity</TableHead>
+                    <TableHead>Last Seen</TableHead>
                     <TableHead>Engagement</TableHead>
                     <TableHead>Zone</TableHead>
                   </TableRow>
@@ -494,8 +494,11 @@ export default function Clients() {
                       <TableCell onClick={() => handleClientClick(client.email)}>
                         <ClientStatusBadge status={client.status as ClientStatus} />
                       </TableCell>
-                      <TableCell 
-                        className="text-muted-foreground"
+                      <TableCell onClick={() => handleClientClick(client.email)}>
+                        <EngagementBadge lastActivity={client.last_activity} />
+                      </TableCell>
+                      <TableCell
+                        className="text-muted-foreground text-sm"
                         onClick={() => handleClientClick(client.email)}
                       >
                         {formatLastActivity(client.last_activity)}

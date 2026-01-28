@@ -1,2 +1,5 @@
-// TODO: Rename from Predict to Inspire
-export { PredictPage as InspireSelfPage } from './PredictPage'
+import { PredictPage } from './PredictPage'
+
+export function InspireSelfPage() {
+  return <PredictPage pageTitle="Define Your Beliefs" />
+}

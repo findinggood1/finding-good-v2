@@ -2,7 +2,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Target, ExternalLink, Loader2 } from 'lucide-react';
+import { Sparkles, ExternalLink, Loader2 } from 'lucide-react';
 import { useClientPredictions } from '@/hooks/useClientPredictions';
 import { cn } from '@/lib/utils';
 
@@ -33,8 +33,8 @@ export function PredictionsCard({ clientEmail }: PredictionsCardProps) {
       <Card className="shadow-soft">
         <CardHeader>
           <CardTitle className="font-serif text-lg flex items-center gap-2">
-            <Target className="h-5 w-5 text-primary" />
-            Predictions
+            <Sparkles className="h-5 w-5 text-primary" />
+            Inspire
           </CardTitle>
         </CardHeader>
         <CardContent className="flex items-center justify-center py-8">
@@ -49,12 +49,12 @@ export function PredictionsCard({ clientEmail }: PredictionsCardProps) {
       <Card className="shadow-soft">
         <CardHeader>
           <CardTitle className="font-serif text-lg flex items-center gap-2">
-            <Target className="h-5 w-5 text-primary" />
-            Predictions
+            <Sparkles className="h-5 w-5 text-primary" />
+            Inspire
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-destructive">Failed to load predictions</p>
+          <p className="text-sm text-destructive">Failed to load beliefs</p>
         </CardContent>
       </Card>
     );
@@ -67,8 +67,8 @@ export function PredictionsCard({ clientEmail }: PredictionsCardProps) {
     <Card className="shadow-soft">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="font-serif text-lg flex items-center gap-2">
-          <Target className="h-5 w-5 text-primary" />
-          Predictions
+          <Sparkles className="h-5 w-5 text-primary" />
+          Inspire
           {predictions && predictions.length > 0 && (
             <Badge variant="secondary" className="ml-2 font-normal">
               {predictions.length}
@@ -81,26 +81,26 @@ export function PredictionsCard({ clientEmail }: PredictionsCardProps) {
           className="gap-1"
           onClick={() => window.open(predictToolUrl, '_blank')}
         >
-          Open Predict Tool
+          Open Inspire Tool
           <ExternalLink className="h-3 w-3" />
         </Button>
       </CardHeader>
       <CardContent>
         {!predictions || predictions.length === 0 ? (
           <div className="text-center py-8">
-            <Target className="h-10 w-10 text-muted-foreground/50 mx-auto mb-3" />
+            <Sparkles className="h-10 w-10 text-muted-foreground/50 mx-auto mb-3" />
             <p className="text-sm text-muted-foreground italic">
-              No predictions yet
+              No beliefs defined yet
             </p>
             <p className="text-xs text-muted-foreground mt-1 mb-4">
-              Help your client get started with their first prediction
+              Help your client define their first belief
             </p>
             <Button
               variant="outline"
               size="sm"
               onClick={() => window.open(predictToolUrl, '_blank')}
             >
-              Start New Prediction
+              Define New Belief
             </Button>
           </div>
         ) : (

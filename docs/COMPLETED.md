@@ -112,3 +112,18 @@
   - Status handling: loading, valid, expired, already_responded, not_found, error
   - Success states after submission
   - Database tables: priority_asks, priority_responses with RLS policies
+
+### Phase 5: Together App (Exchange Hub)
+- [x] 5a: Together app P0 + P1 (January 17, 2026)
+  - 4-page structure: Home, Exchange, Campfire, Map
+  - **Home page:** Predictability score, FIRES grid with zones, activity counts, this week's evidence, noticing in others
+  - **Exchange page:** Growth edge card, exchange impact tracking, active asks
+  - **Campfire page:** Circle feed with empty state, pending asks section
+  - **Map page:** Activity counts (all-time), yours vs others comparison, trajectory chart
+  - **Database tables:** exchange_impacts, recognized_entries, predictions.question column
+  - **7 hooks:** useActivityCounts, useExchangeImpacts, useYoursVsOthers, useTrajectory, usePendingAsks, useThisWeeksEvidence, useNoticingInOthers
+  - **15+ components:** PredictabilityCard, FiresGrid, FeedCard, GrowthEdgeCard, TrajectoryChart, YoursVsOthersChart, etc.
+  - **Actions:** recognizeEntry(), recordImpact()
+  - 34 new files (~1,400 lines)
+  - Build verified: 456KB bundle
+  - Pushed to origin/master
