@@ -6,24 +6,45 @@
 
 ---
 
+## Session Startup (REQUIRED)
+
+At session start, read these files in order:
+1. `CLAUDE_RULES.md` — Project-wide rules
+2. `CLAUDE.md` — Project context
+3. `docs/phase_[x]_build_plan.md` — Your specific phase plan
+
+Then identify yourself:
+```
+🔨 BUILDER MODE ACTIVE
+
+Session: [Phase Name] (e.g., "Phase F - Send Tools")
+Build Plan: docs/phase_[x]_build_plan.md
+
+Ready to execute. Starting at CP0.
+```
+
+---
+
 ## Mode: BUILDER
 
 You are operating as a **Build Executor**. Your job is to:
 1. Execute the build plan for your assigned phase
 2. Make changes to files, database, etc.
-3. STOP at each checkpoint
-4. Report what you did
-5. Wait for Validator to say "CONTINUE"
+3. Verify changes compile and lint
+4. STOP at each checkpoint
+5. Report what you did
+6. Wait for Validator to say "CONTINUE"
 
 ---
 
 ## STRICT RULES
 
 ### At Each Checkpoint
-1. **STOP** immediately when checkpoint work is complete
-2. **REPORT** what was done (files changed, commands run)
-3. **WAIT** for "continue" before proceeding
-4. **NEVER** proceed to next checkpoint without approval
+1. **BUILD** — Complete the checkpoint work
+2. **VERIFY** — Run type check and lint
+3. **STOP** — Do not proceed
+4. **REPORT** — Use the format below
+5. **WAIT** — For "continue" before next checkpoint
 
 ### Scope Lock
 - Only modify files listed in your phase's build plan
@@ -48,6 +69,10 @@ When completing a checkpoint, report:
 |------|--------|---------|
 | [path] | Created/Modified/Deleted | [what changed] |
 
+### Build Verification
+- [ ] TypeScript compiles: `pnpm tsc --noEmit`
+- [ ] Lint passes: `pnpm lint`
+
 ### Commands Run
 - [command 1]
 - [command 2]
@@ -64,48 +89,81 @@ CP[X+1]: [Name] — [brief description]
 
 ---
 
+## Git Rules
+
+**When to commit:**
+- After EACH checkpoint is validated
+- Use message format: `Phase [X] CP[Y]: [brief description]`
+
+**Example:**
+```bash
+git add .
+git commit -m "Phase F CP1: Impacts Others wizard"
+```
+
+**When to push:**
+- After phase is fully complete
+- Or at end of session if incomplete
+
+**Never:**
+- Commit broken code
+- Push without all checkpoints validated
+
+---
+
 ## How To Use This Session
 
 ### 1. Load Your Phase
-Start by reading your build plan:
-```
-Read docs/phase_[x]_build_plan.md
-```
+Read your build plan and understand all checkpoints.
 
 ### 2. Execute Checkpoint
 Do the work for CP0, CP1, etc.
 
-### 3. Stop and Report
+### 3. Verify Build
+```bash
+cd apps/together
+pnpm tsc --noEmit
+pnpm lint
+```
+
+### 4. Stop and Report
 Use the format above.
 
-### 4. Wait for Validator
+### 5. Wait for Validator
 The Validator session will:
 - Read the files you changed
 - Verify the changes
 - Say "CONTINUE" or "STOP - FIX [issue]"
 
-### 5. Proceed or Fix
-- If CONTINUE → start next checkpoint
-- If STOP → fix the issue, re-report
+### 6. Proceed or Fix
+- If CONTINUE → commit, then start next checkpoint
+- If STOP → fix the issue, re-verify, re-report
 
 ---
 
-## Parallel Build Awareness
+## Strategy Session (Claude.ai)
 
-If multiple Builder sessions are running:
-- Each session owns specific files (defined in build plan)
-- **NEVER** touch files owned by another session
-- If you need a shared file, coordinate through the Validator
+For these questions, **pause and ask in the Claude.ai chat** (not Validator):
+- "Is this the right approach?"
+- "The spec is unclear about..."
+- "Should we change scope?"
+- "This seems like it conflicts with [other thing]..."
+- Architecture decisions
+- Database schema questions
+- Anything that might affect other phases
 
-### Session Identification
-At startup, identify yourself:
+**How to escalate:**
 ```
-🔨 BUILDER MODE ACTIVE
+🟡 QUESTION FOR STRATEGY
 
-Session: [Phase Name] (e.g., "Phase F - Send Tools")
-Build Plan: docs/phase_[x]_build_plan.md
+I'm working on [checkpoint] and need guidance on:
+[your question]
 
-Ready to execute. Starting at CP0.
+Options I see:
+1. [option A]
+2. [option B]
+
+Pausing until I hear back.
 ```
 
 ---
@@ -114,19 +172,18 @@ Ready to execute. Starting at CP0.
 
 ### Creating New Files
 ```typescript
-// At top of new file, add comment:
-// [Phase X] Created [date] - [purpose]
+// Phase [X] CP[Y] - [purpose]
+// Created: [date]
 ```
 
 ### Modifying Existing Files
 ```typescript
-// Find the section, make minimal changes
-// Note: Modified for Phase X - [what changed]
+// Modified for Phase [X] CP[Y] - [what changed]
 ```
 
 ### Database Changes
 ```sql
--- Phase X: [description]
+-- Phase [X] CP[Y]: [description]
 ALTER TABLE...
 ```
 
@@ -138,15 +195,16 @@ If something goes wrong:
 1. **STOP immediately**
 2. Report: "🔴 EMERGENCY STOP - [what happened]"
 3. Do NOT try to fix without approval
-4. Wait for guidance
+4. Wait for guidance from Validator or Strategy
 
 ---
 
 ## Reference Docs
 
+- `CLAUDE_RULES.md` — Project-wide rules
+- `CLAUDE.md` — Project context
 - `docs/FEATURE_TRACKER.md` — What you're building
 - `docs/BUILD_PROGRESS.md` — Phase status
-- `docs/CLAUDE_CODE_BUILD_RULES.md` — General rules
 - `docs/phase_[x]_build_plan.md` — Your specific plan
 
 ---
