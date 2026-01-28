@@ -12,6 +12,23 @@ Each Claude Code session owns specific files and cannot touch anything else. Thi
 
 ---
 
+## Rule 0: Feature Tracker Check (MANDATORY)
+
+**Before starting ANY phase or session:**
+
+1. Open `docs/FEATURE_TRACKER.md`
+2. Verify all features for this phase are listed
+3. Confirm no features are "⏳ Not Assigned" that should be in this phase
+4. Update feature statuses as you work:
+   - "📋 Planned" → "🔨 In Progress" when starting
+   - "🔨 In Progress" → "✅ Complete" when done
+
+**Why this matters:** Features got lost between V2 spec and phase plans. The tracker is the single source of truth. If it's not in the tracker, it doesn't exist.
+
+**If you find a missing feature:** STOP. Add it to the tracker. Assign it to a phase.
+
+---
+
 ## Rule 1: Scope Lock
 
 Every session declares what it can modify:
@@ -224,6 +241,8 @@ END SESSION
 
 | File | Purpose | Who Updates |
 |------|---------|-------------|
+| `docs/FEATURE_TRACKER.md` | **Single source of truth for ALL features** | Check before every phase |
+| `docs/COMPLETE_BUILD_PHASES.md` | Master phase sequence with all phases | Reference for planning |
 | `docs/build_packets/XX_[tool]_packet.md` | Build instructions | Created before building |
 | `docs/build_sessions/[tool]_session.md` | Session status/lock | Active session |
 | `docs/BUILD_PROGRESS.md` | Overall progress | All sessions |

@@ -1,55 +1,47 @@
 # Current Phase
 
-**Last Updated:** January 27, 2026
+**Last Updated:** January 28, 2026
 
 ---
 
 ## Status
 
-**Current Phase:** Phase C — Tool Landing Pages, Renames, & Inspire Others  
-**Previous Phase:** Phase B — Home/Influence Page ✅ Complete  
+**Current Phase:** Phase D — Exchange  
+**Previous Phase:** Phase E — Dashboard ✅ Complete  
 **Blocking Issues:** None
 
 ---
 
-## Phase B Summary (Complete)
+## Recently Completed
 
-Home page restructured with Four I's action-oriented design:
-- YOUR INFLUENCE section (Permission, Practice, Focus with inline edit)
-- WHAT YOU'RE CREATING section (Predictions/beliefs)
-- TODAY'S CHECK-IN (Focus item checkboxes, engagement, reflection)
-- THIS WEEK section (Active beliefs + evidence counts)
-- RECENT ACTIVITY (Sent/Received entries)
-- INSIGHTS section (Rule-based contextual messages)
-- FEED section (Bottom of page)
+### Phase C: Tool Landing Pages + Inspire Others ✅
+- ToolLandingPage reusable component
+- Impact/Improve/Inspire landing pages with content
+- Self pages branding (Record Your Impact, Validate Your Improvement, Define Your Beliefs)
+- Others pages branding (Recognize Someone's Impact, Witness Someone's Growth, Inspire Someone)
+- **NEW: Inspire Others flow** — 5-step wizard with share link + recipient view
 
-Map page now contains analytics:
-- PredictabilityCard
-- FIRES Grid
-- Trajectory Chart
-- Activity Counts
-- Yours vs Others comparison
-
-Database: `daily_reflections` table created with RLS policies.
+### Phase E: Dashboard ✅
+- V2 naming throughout (Impact/Improve/Inspire)
+- YOUR INFLUENCE section (Permission/Practice/Focus)
+- Quick Prep section (activity since last session, FIRES patterns)
+- Engagement indicators (Active/Engaged/Quiet/Inactive)
+- UI refinement: Combined nav bar, merged Assignments into Sessions
+- Summary Cards moved to Inspire tab
 
 ---
 
-## Phase C Overview (Next)
+## Phase D Overview (Next)
 
-Build landing pages for the three I's and complete the Inspire Others flow:
+Build the Exchange feature for mutual visibility between users:
 
-1. **Checkpoint 1:** Reusable ToolLandingPage component
-2. **Checkpoint 2:** Impact landing page with content
-3. **Checkpoint 3:** Improve landing page with content  
-4. **Checkpoint 4:** Inspire landing page with content
-5. **Checkpoint 5:** Update Self pages with new branding
-6. **Checkpoint 6:** Update Others pages with new branding
-7. **Checkpoint 7:** BUILD Inspire Others flow (NEW — does not exist yet)
+1. **Checkpoint 1:** Exchange hooks (partners, invitations, activity)
+2. **Checkpoint 2:** Exchange list page (partners + pending invites)
+3. **Checkpoint 3:** Invite modal
+4. **Checkpoint 4:** Partnership detail view
+5. **Checkpoint 5:** Activity entry cards
 
-**Key Note:** Impact Others (RecognizePage) and Improve Others (OtherMode) already exist. 
-Only Inspire Others needs to be built from scratch.
-
-**Build plan:** `docs/phase_c_build_plan.md`
+**Build plan:** `docs/phase_d_build_plan.md`
 
 ---
 
@@ -57,11 +49,9 @@ Only Inspire Others needs to be built from scratch.
 
 | Phase | Content | Est. Sessions |
 |-------|---------|---------------|
-| **C** (Current) | Tool Landing Pages + Inspire Others | 1-2 |
-| **D** | Exchange (partnerships) | 1-2 |
-| **E** | Dashboard (Coach view) | 1-2 |
-
-**Total remaining:** ~4-6 sessions
+| **D** (Next) | Exchange (mutual visibility) | 1-2 |
+| **E.5** | Sent/Received data in Dashboard | 1 |
+| **Future** | Dashboard ↔ Together alignment | TBD |
 
 ---
 
@@ -69,33 +59,29 @@ Only Inspire Others needs to be built from scratch.
 
 | Doc | Purpose |
 |-----|---------|
-| `docs/phase_c_build_plan.md` | Current phase instructions |
+| `docs/phase_d_build_plan.md` | Current phase instructions |
 | `docs/COLLABORATION_PROTOCOL.md` | How Desktop + Code Claude work together |
 | `docs/naming_concordance.md` | Old → new name mappings |
-| `docs/handoffs/phase_b_complete.md` | What was just built |
+| `docs/handoffs/phase_e_complete.md` | What was just built |
 
 ---
 
-## Starting Phase C Prompt
+## Starting Phase D Prompt
 
 ```
-Starting Phase C: Tool Landing Pages, Renames, & Inspire Others.
+Starting Phase D: Exchange
 
 Read these files first:
-- docs/phase_c_build_plan.md (primary guide)
+- docs/phase_d_build_plan.md (primary guide)
 - docs/COLLABORATION_PROTOCOL.md (how we work)
-- docs/naming_concordance.md (label mappings)
 
 Pre-flight checklist:
 1. Verify Together app runs at localhost:3005
-2. Check TypeScript compiles: pnpm tsc --noEmit
-3. Check git status for uncommitted changes
-4. Review existing Others pages:
-   - apps/priority/src/pages/RecognizePage.tsx (Impact Others - EXISTS)
-   - apps/prove/src/pages/OtherMode.tsx (Improve Others - EXISTS)
-   - apps/predict/src/pages/ (Inspire Others - DOES NOT EXIST)
+2. Check if exchange_partnerships table exists (via Supabase MCP)
+3. If not, run the SQL from the build plan to create it
+4. Check git status for uncommitted changes
 
-Then start Checkpoint 1: Reusable ToolLandingPage Component
+Then start Checkpoint 1: Exchange Hooks
 
 STOP after each checkpoint for validation.
 ```

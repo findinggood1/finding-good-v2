@@ -4,6 +4,19 @@
 
 ---
 
+## Pre-Session Checklist (MANDATORY)
+
+Before starting ANY session:
+
+- [ ] Check `docs/FEATURE_TRACKER.md` — Is this phase's features listed correctly?
+- [ ] Check `docs/BUILD_PROGRESS.md` — What's the current status?
+- [ ] Check `docs/COMPLETE_BUILD_PHASES.md` — What's the full sequence?
+- [ ] Are there any "⏳ Not Assigned" features that should be in this phase?
+
+**If features are missing from the tracker, add them BEFORE starting the build.**
+
+---
+
 ## Starter Prompt
 
 ```
@@ -11,40 +24,33 @@ I'm continuing the Finding Good V2 build. This is a coaching platform with apps 
 
 **Project Location:** C:\Users\bfret\finding-good-v2 (monorepo with pnpm workspaces)
 
-**Current Phase:** Phase C — Tool Landing Pages + Inspire Others
+**MANDATORY FIRST STEP:** Read docs/FEATURE_TRACKER.md to verify all features for this phase are listed.
 
-**What's Complete:**
-- Phase A: Navigation restructured to Four I's framework (Impact/Improve/Inspire)
-- Phase B: Home page rebuilt with Influence section, daily check-in, weekly activity, insights
+**Current Status:**
+- Phase A-E: ✅ COMPLETE
+- Phase E.5 (Dashboard Data): ⏳ NOT STARTED
+- Phase F (Send Tools): 📋 PLANNED
+- Phase G (Social Features): 📋 PLANNED
+- Phase H-K: 📋 PLANNED
 
-**What's Next (Phase C has 7 checkpoints):**
-1. Reusable ToolLandingPage component
-2. Impact landing page
-3. Improve landing page  
-4. Inspire landing page
-5. Update Self pages with new branding
-6. Update Others pages with new branding
-7. BUILD Inspire Others flow (new — doesn't exist yet)
-
-**Key Files to Read:**
-- docs/CURRENT_PHASE.md — Current status and starter prompt for Claude Code
-- docs/phase_c_build_plan.md — Detailed checkpoint instructions
-- docs/BUILD_PROGRESS.md — Overall progress tracker
-- docs/handoffs/phase_b_complete.md — What was just built
-- docs/naming_concordance.md — Old → new name mappings
-- docs/COLLABORATION_PROTOCOL.md — How Desktop + Claude Code work together
+**Key Docs:**
+- docs/FEATURE_TRACKER.md — **SINGLE SOURCE OF TRUTH** for all features
+- docs/COMPLETE_BUILD_PHASES.md — Full phase sequence with all features
+- docs/BUILD_PROGRESS.md — Current progress by phase
+- docs/CLAUDE_CODE_BUILD_RULES.md — Build rules (includes Rule 0: Feature Tracker Check)
+- docs/phase_[X]_build_plan.md — Detailed checkpoints for specific phase
 
 **How We Work:**
 - Desktop Claude: Strategic guidance, checkpoint validation, architecture decisions
 - Claude Code: Executes builds, writes code, runs commands
 - STOP at each checkpoint for validation before continuing
 
-**Important Context:**
-- Impact Others (RecognizePage) already exists — just needs title update
-- Improve Others (OtherMode) already exists — just needs title update  
-- Inspire Others does NOT exist — must be built from scratch in Checkpoint 7
+**Feature Tracker Rule:**
+- Update features to "🔨 In Progress" when starting
+- Update features to "✅ Complete" when done
+- If you find a missing feature → STOP, add to tracker, assign to phase
 
-Please read the key files and confirm you're ready to guide Phase C. When I start Claude Code, I'll use the prompt from CURRENT_PHASE.md.
+Please read FEATURE_TRACKER.md first, then confirm what phase we're working on and that all features are accounted for.
 ```
 
 ---
@@ -61,28 +67,62 @@ Please read the key files and confirm you're ready to guide Phase C. When I star
 
 ---
 
-## Session Tips
+## Phase Sequence
 
-1. **Start Claude Code** with the prompt in `docs/CURRENT_PHASE.md`
-2. **After each checkpoint**, Claude Code will STOP — paste results here for validation
-3. **Before moving on**, confirm the checkpoint passes
-4. **Update BUILD_PROGRESS.md** at each checkpoint
-5. **Create handoff doc** at end of session
+```
+COMPLETED:
+├── Phase A: Navigation ············· ✅
+├── Phase B: Home/Influence ········· ✅
+├── Phase C: Tool Landing + Inspire · ✅
+├── Phase D: Exchange ··············· ✅
+└── Phase E: Dashboard ·············· ✅
+
+NEXT:
+├── Phase E.5: Dashboard Data ······· Sent/received in tabs
+├── Phase F: Send Tools ············· Impact/Improve Others wizards
+└── Phase G: Social Features ········ Circle tracker, notifications
+
+THEN:
+├── Phase H: Check-in Enhancement ··· Bridge question, week history
+├── Phase I: Chat Page ·············· AI self-discovery
+├── Phase J: Profile & Settings ····· Notification prefs, privacy
+└── Phase K: Map AI Features ········ Coached synthesis features
+```
 
 ---
 
-## What We Accomplished Today (Jan 27, 2026)
+## Session Tips
 
-**Phase B - Home/Influence Page:**
-- YOUR INFLUENCE section (Permission, Practice, Focus inline edit)
-- WHAT YOU'RE CREATING (Predictions moved here)
-- TODAY'S CHECK-IN (Focus checkboxes, engagement, reflection question)
-- THIS WEEK (Active beliefs + evidence counts)
-- RECENT ACTIVITY (Sent/Received with type icons)
-- INSIGHTS (Rule-based contextual messages)
-- Map page now has all analytics
-- daily_reflections table with RLS
+1. **Start with FEATURE_TRACKER.md** — This is now mandatory
+2. **Start Claude Code** with the prompt in `docs/CURRENT_PHASE.md`
+3. **After each checkpoint**, Claude Code will STOP — paste results here for validation
+4. **Before moving on**, confirm the checkpoint passes
+5. **Update BUILD_PROGRESS.md** at each checkpoint
+6. **Update FEATURE_TRACKER.md** as features complete
+7. **Create handoff doc** at end of session
 
-**Files created:** 6 new components, 3 new hooks, 2 pages restructured
+---
 
-Great session! 🎉
+## What Happened January 28, 2026
+
+**Discovery:** Features got lost between V2 spec (Jan 25) and phase plans (Jan 27).
+
+**Fix Created:**
+- `docs/FEATURE_TRACKER.md` — Single source of truth for ALL features
+- `docs/COMPLETE_BUILD_PHASES.md` — All phases including G, H, I, J, K
+- Updated `CLAUDE_CODE_BUILD_RULES.md` with Rule 0: Feature Tracker Check
+- Updated this file with pre-session checklist
+
+**Lost Features Now Tracked:**
+- Circle tracker (Phase G)
+- Notifications section (Phase G)
+- Recognition counts/buttons (Phase G)
+- Bridge question flow (Phase H)
+- Week history (Phase H)
+- Chat page (Phase I)
+- Profile settings (Phase J)
+- Map AI features (Phase K)
+
+---
+
+**End of Session Starter**
