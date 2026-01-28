@@ -11,6 +11,10 @@ export interface DailyReflection {
   focus_items_completed: number
   focus_items_total: number
   completed_items: string[] | null
+  item_engagements: Record<string, number> | null
+  bridge_question: string | null
+  bridge_answer: string | null
+  bridge_focus_item: string | null
   created_at: string
   updated_at: string
 }
@@ -25,7 +29,9 @@ export interface UseDailyReflectionReturn {
   error: string | null
   toggleFocusItem: (itemName: string, focusTotal: number) => Promise<void>
   setEngagement: (level: number) => Promise<void>
+  setItemEngagement: (itemName: string, level: number) => Promise<void>
   saveAnswer: (answer: string, questionShown: string) => Promise<void>
+  saveBridgeAnswer: (answer: string, question: string, focusItem: string) => Promise<void>
 }
 
 export function useDailyReflection(): UseDailyReflectionReturn {
@@ -159,6 +165,33 @@ export function useDailyReflection(): UseDailyReflectionReturn {
     }
   }, [user?.email, ensureReflection])
 
+  const setItemEngagement = useCallback(async (itemName: string, level: number) => {
+    if (!user?.email) return
+
+    try {
+      const record = await ensureReflection()
+      if (!record) return
+
+      const currentEngagements = record.item_engagements || {}
+      const newEngagements = { ...currentEngagements, [itemName]: level }
+
+      const supabase = getSupabase()
+      const { error: updateError } = await supabase
+        .from('daily_reflections')
+        .update({
+          item_engagements: newEngagements,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', record.id)
+
+      if (updateError) throw updateError
+
+      setReflection(prev => prev ? { ...prev, item_engagements: newEngagements } : null)
+    } catch (err) {
+      console.error('Error setting item engagement:', err)
+    }
+  }, [user?.email, ensureReflection])
+
   const saveAnswer = useCallback(async (answer: string, questionShown: string) => {
     if (!user?.email) return
 
@@ -184,12 +217,45 @@ export function useDailyReflection(): UseDailyReflectionReturn {
     }
   }, [user?.email, ensureReflection])
 
+  const saveBridgeAnswer = useCallback(async (answer: string, question: string, focusItem: string) => {
+    if (!user?.email) return
+
+    try {
+      const record = await ensureReflection()
+      if (!record) return
+
+      const supabase = getSupabase()
+      const { error: updateError } = await supabase
+        .from('daily_reflections')
+        .update({
+          bridge_answer: answer,
+          bridge_question: question,
+          bridge_focus_item: focusItem,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', record.id)
+
+      if (updateError) throw updateError
+
+      setReflection(prev => prev ? {
+        ...prev,
+        bridge_answer: answer,
+        bridge_question: question,
+        bridge_focus_item: focusItem,
+      } : null)
+    } catch (err) {
+      console.error('Error saving bridge answer:', err)
+    }
+  }, [user?.email, ensureReflection])
+
   return {
     reflection,
     loading,
     error,
     toggleFocusItem,
     setEngagement,
+    setItemEngagement,
     saveAnswer,
+    saveBridgeAnswer,
   }
 }

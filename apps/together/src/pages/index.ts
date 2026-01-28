@@ -23,11 +23,13 @@ export { ChatPage } from './ChatPage'
 export { ImpactsLandingPage } from './ImpactsLandingPage'
 export { ImpactsSelfPage } from './ImpactsSelfPage'
 export { ImpactsOthersPage } from './ImpactsOthersPage'
+export { ImpactsViewPage } from './ImpactsViewPage'
 
 // Insights (was Improve/Proof)
 export { InsightsLandingPage } from './InsightsLandingPage'
 export { InsightsSelfPage } from './InsightsSelfPage'
 export { InsightsOthersPage } from './InsightsOthersPage'
+export { InsightsViewPage } from './InsightsViewPage'
 
 // Inspirations (was Inspire/Predict)
 export { InspirationsLandingPage } from './InspirationsLandingPage'

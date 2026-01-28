@@ -1,18 +1,20 @@
 import { LoadingSpinner } from '@finding-good/shared'
 import { PredictionsHeader, FeedCard } from '../components'
-import { InfluenceSection, DailyCheckin, ThisWeekSection, RecentActivitySection, InsightsSection } from '../components/home'
+import { InfluenceSection, DailyCheckin, ThisWeekSection, RecentActivitySection, InsightsSection, WeekHistoryCalendar, WeeklyEngagement } from '../components/home'
+import { Card } from '../components/ui'
 import { usePermission } from '../hooks/usePermission'
 import { useDailyReflection } from '../hooks/useDailyReflection'
 import { usePredictions } from '../hooks/usePredictions'
 import { useFeed } from '../hooks/useFeed'
 import { useWeeklyActivity } from '../hooks/useWeeklyActivity'
 import { useRecentActivity } from '../hooks/useRecentActivity'
+import { useWeekHistory } from '../hooks/useWeekHistory'
 
 export function HomePage() {
   const { permission, loading: permissionLoading, savePermission } = usePermission()
   const {
     reflection, loading: reflectionLoading,
-    toggleFocusItem, setEngagement, saveAnswer,
+    toggleFocusItem, setItemEngagement, saveBridgeAnswer,
   } = useDailyReflection()
   const { predictions, loading: predictionsLoading } = usePredictions()
   const { items: feedItems, loading: feedLoading } = useFeed()
@@ -21,6 +23,7 @@ export function HomePage() {
     loading: weeklyLoading,
   } = useWeeklyActivity()
   const { sent, received, loading: recentLoading } = useRecentActivity()
+  const { days: weekDays, focusAverages, loading: weekHistoryLoading } = useWeekHistory()
 
   const loading = predictionsLoading || feedLoading
 
@@ -54,10 +57,24 @@ export function HomePage() {
           loading={reflectionLoading}
           weeklyCheckinCount={checkinCount}
           onToggleItem={toggleFocusItem}
-          onSetEngagement={setEngagement}
-          onSaveAnswer={saveAnswer}
+          onSetItemEngagement={setItemEngagement}
+          onSaveBridgeAnswer={saveBridgeAnswer}
         />
       </div>
+
+      {/* 3b. Week History (shows when there's check-in data) */}
+      {(weekDays.length > 0 || focusAverages.length > 0) && (
+        <div className="px-4">
+          <Card>
+            <div className="space-y-6">
+              <WeekHistoryCalendar days={weekDays} loading={weekHistoryLoading} />
+              {focusAverages.length > 0 && (
+                <WeeklyEngagement focusAverages={focusAverages} loading={weekHistoryLoading} />
+              )}
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* 4. This Week */}
       <div className="px-4">

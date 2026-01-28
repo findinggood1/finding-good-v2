@@ -18,9 +18,11 @@ import {
   ImpactsLandingPage,
   ImpactsSelfPage,
   ImpactsOthersPage,
+  ImpactsViewPage,
   InsightsLandingPage,
   InsightsSelfPage,
   InsightsOthersPage,
+  InsightsViewPage,
   InspirationsLandingPage,
   InspirationsSelfPage,
   InspirationsOthersPage,
@@ -43,6 +45,8 @@ function App() {
         {/* Public routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Route path="/impacts/view/:shareId" element={<ImpactsViewPage />} />
+        <Route path="/insights/view/:shareId" element={<InsightsViewPage />} />
         <Route path="/inspirations/view/:shareId" element={<InspirationsRecipientView />} />
 
         {/* Home (Influence) */}

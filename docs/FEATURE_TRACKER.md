@@ -179,20 +179,20 @@
 | FIRES extraction | — | ✅ Complete | Existing |
 | Share to feed toggle | — | ⏳ Not Assigned | |
 
-### Impact Others (Recognize)
+### Impact Others (Recognize) — Now "Impacts Others"
 | Feature | Phase | Status | Notes |
 |---------|-------|--------|-------|
-| **WHO step** | F | 📋 Planned | Name + email |
-| **WHAT step** | F | 📋 Planned | What they did |
-| **MEANING step** | F | 📋 Planned | What it showed |
-| **IMPACT step** | F | 📋 Planned | How it affected you |
-| **PREVIEW step** | F | 📋 Planned | Review before send |
-| **COMPLETE step** | F | 📋 Planned | Share link |
-| **Recipient view page** | F | 📋 Planned | /impact/view/:shareId |
-| **Thank button** | F | 📋 Planned | Acknowledge receipt |
-| **Dual FIRES extraction** | F | 📋 Planned | Sender + recipient |
-| **Clarity grade** | F | 📋 Planned | ○○○ / ●●○ / ●●● |
-| **Go deeper question** | F | 📋 Planned | AI follow-up |
+| **WHO step** | F | ✅ Complete | Name + email + relationship |
+| **WHAT step** | F | ✅ Complete | What they did |
+| **MEANING step** | F | ✅ Complete | What it showed |
+| **IMPACT step** | F | ✅ Complete | How it affected you |
+| **PREVIEW step** | F | ✅ Complete | Review + share toggle |
+| **COMPLETE step** | F | ✅ Complete | Share link |
+| **Recipient view page** | F | ✅ Complete | /impacts/view/:shareId |
+| **Thank button** | F | ✅ Complete | Acknowledge receipt |
+| **Dual FIRES extraction** | F.5 | 📋 Future | Sender + recipient (AI) |
+| **Clarity grade** | F.5 | 📋 Future | ○○○ / ●●○ / ●●● (AI) |
+| **Go deeper question** | F.5 | 📋 Future | AI follow-up |
 
 ---
 
@@ -208,20 +208,20 @@
 | FIRES extraction | — | ✅ Complete | Existing |
 | Share to feed toggle | — | ⏳ Not Assigned | |
 
-### Improve Others (Witness)
+### Improve Others (Witness) — Now "Insights Others"
 | Feature | Phase | Status | Notes |
 |---------|-------|--------|-------|
-| **WHO step** | F | 📋 Planned | Name + email |
-| **OUTCOME step** | F | 📋 Planned | What they accomplished |
-| **PROCESS step** | F | 📋 Planned | How they did it |
-| **KEY MOVE step** | F | 📋 Planned | Decision that stood out |
-| **IMPACT step** | F | 📋 Planned | The effect |
-| **PREVIEW step** | F | 📋 Planned | Review before send |
-| **COMPLETE step** | F | 📋 Planned | Share link |
-| **Recipient view page** | F | 📋 Planned | /improve/view/:shareId |
-| **Thank button** | F | 📋 Planned | Acknowledge receipt |
-| **Recipe output** | F | 📋 Planned | approach + key_move + why |
-| **Dual FIRES extraction** | F | 📋 Planned | Sender + recipient |
+| **WHO step** | F | ✅ Complete | Name + email + relationship |
+| **OUTCOME step** | F | ✅ Complete | What they accomplished |
+| **PROCESS step** | F | ✅ Complete | How they did it |
+| **KEY MOVE step** | F | ✅ Complete | Decision that stood out |
+| **IMPACT step** | F | ✅ Complete | The effect |
+| **PREVIEW step** | F | ✅ Complete | Review + share toggle |
+| **COMPLETE step** | F | ✅ Complete | Share link |
+| **Recipient view page** | F | ✅ Complete | /insights/view/:shareId |
+| **Thank button** | F | ✅ Complete | Acknowledge receipt |
+| **Recipe output** | F | ✅ Complete | UI ready (AI fills later) |
+| **Dual FIRES extraction** | F.5 | 📋 Future | Sender + recipient (AI) |
 
 ---
 
